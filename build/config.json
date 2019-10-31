@@ -1,0 +1,18 @@
+{
+	"definitionsToRelease": [
+		"debian-9-git"
+	],
+
+	"definitionsToSkip": [
+		"docker-existing-docker-compose",
+		"docker-existing-dockerfile"
+	],
+
+	"alpineDefinitions": [
+	    "alpine-3.10-git"
+	],
+
+	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers",
+
+	"username": "chuxel"
+}
