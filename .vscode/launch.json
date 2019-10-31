@@ -8,9 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "Run Release Script",
-			"program": "${workspaceFolder}/scripts/release.js",
-			"args": [ 
-				"--tag", "v0.33.0", 
+			"program": "${workspaceFolder}/build/vscdc.js",
+			"args": [
+				"release",
+				"v0.33.0", 
 				"--update-latest", "true" 
 			]
         }
