@@ -1,7 +1,16 @@
 {
 	"username": "chuxel",
 	"definitionsToPush": [
-		"debian-9-git"
+		"alpine-3.10-git",
+		"azure-functions-node-8",
+		"azure-functions-node-lts",
+		"debian-9-git",
+		"go",
+		"javascript-node-8",
+		"javascript-node-lts",
+		"typescript-node-8",
+		"typescript-node-lts",
+		"ubuntu-18.04-git"
 	],
 	"definitionsToSkip": [
 		"docker-existing-docker-compose",

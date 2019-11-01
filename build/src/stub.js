@@ -6,23 +6,17 @@
 const path = require('path');
 const utils = require('./utils');
 
-const stubDockerFiles = {
-    alpine: null,
-    debian: null
-};
+const  alpineStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', 'debian.Dockerfile'));
+const  debianStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', 'alpine.Dockerfile'));
 
 module.exports = {
     createStub: async function(dotDevContainerPath, definitionId, version, isAlpine) {
         isAlpine = isAlpine || (utils.getConfig('alpineDefinitions',[]).indexOf(definitionId) > 0); 
         version = version || 'latest';
-        if(!stubDockerFiles.alpine ) {
-            stubDockerFiles.debian = await utils.readFile(path.join(__dirname, '..', 'assets', 'debian.Dockerfile'));
-            stubDockerFiles.alpine = await utils.readFile(path.join(__dirname, '..', 'assets', 'alpine.Dockerfile'));    
-        }
         
         const userDockerFilePath = path.join(dotDevContainerPath, 'user.Dockerfile');
         console.log('(*) Generating user.Dockerfile...');
-        const templateDockerfile = isAlpine ? stubDockerFiles.alpine : stubDockerFiles.debian;
+        const templateDockerfile = isAlpine ? await alpineStubPromise : await debianStubPromise;
         const baseTag = utils.getBaseTag(definitionId);
         const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME',
             `# See Dockerfile for information on the contents of this image:\nFROM ${baseTag}:${version}`);
