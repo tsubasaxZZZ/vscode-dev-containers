@@ -12,44 +12,42 @@ const packageJson = require('../package.json');
 console.log('vscode-dev-containers CLI\nCopyright (c) Microsoft Corporation. All rights reserved.\n')
 
 require('yargs')
-    .command('push [devcontainer]', 'push dev container images to a repository', (yargs) => {
-        yargs
-            .positional('devcontainer', {
-                'devcontainer': {
-                    describe: 'ID of a specific dev container definition to release',
-                    default: null
-                }
-            })
-            .options({
-                'release': {
-                    describe: 'vscode-dev-containers release tag (e.g. v0.55.1)',
-                    default: `v${packageJson.version}`
-                },
-                'update-latest': {
-                    describe: 'whether to update the "latest" and "{MAJOR}" tags with this version',
-                    type: 'boolean',
-                    default: true
-                }
-            })
-    }, pushCommand)
-    .command(['pack', '$0'], 'package dev container definitions', (yargs) => {
+    .command('pack', 'package dev container definitions', (yargs) => {
         yargs
             .options({
                 'release': {
-                    describe: 'vscode-dev-containers release tag (e.g. v0.55.1)',
+                    describe: 'vscode-dev-containers release tag',
                     default: `v${packageJson.version}`
                 },
                 'update-latest': {
-                    describe: 'whether to update the "latest" and "{MAJOR}" tags with this version',
+                    describe: 'whether to tag latest and {MAJOR}',
                     type: 'boolean',
                     default: true
                 }
             })
     }, packCommand)
+    .command('push [devcontainer]', 'push dev container images to a repository', (yargs) => {
+        yargs
+            .positional('devcontainer', {
+                describe: 'ID of dev container to push',
+                default: null
+            })
+            .options({
+                'release': {
+                    describe: 'vscode-dev-containers release tag',
+                    default: `v${packageJson.version}`
+                },
+                'update-latest': {
+                    describe: 'whether to tag latest and {MAJOR}',
+                    type: 'boolean',
+                    default: true
+                }
+            })
+    }, pushCommand)
     .command('stub <devcontainer> [path]', 'generates a stub user.Dockerfile', (yargs) => {
         yargs
             .positional('devcontainer', {
-                describe: 'ID of dev container definition',
+                describe: 'ID of dev container to stub',
             })
             .positional('path', {
                 describe: 'path to .devcontainer folder',
@@ -67,6 +65,7 @@ require('yargs')
                 }
             })
     }, stubCommand)
+    .demandCommand()
     .help()
     .argv;
 

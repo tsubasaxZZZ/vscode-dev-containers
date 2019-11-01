@@ -1,20 +1,22 @@
 {
+	"username": "chuxel",
 	"definitionsToPush": [
 		"debian-9-git"
 	],
-
 	"definitionsToSkip": [
 		"docker-existing-docker-compose",
 		"docker-existing-dockerfile"
 	],
-
 	"alpineDefinitions": [
 	    "alpine-3.10-git"
 	],
-
-	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers",
-
+	"filesToStage": [
+		"+(containers|repository-containers|LICENSE)/**/!(test-project)/*",
+		"LICENSE",
+		"package.json",
+		"yarn.lock",
+		".npmignore"
+	],
 	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
-
-	"username": "chuxel"
+	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers"
 }

@@ -12,7 +12,7 @@ const utils = require('./utils');
     const stagingFolder = await push(release, updateLatest);
  
     // Then package
-    console.log(`\n(*) **** Package ${release} in ${stagingFolder} ****`);
+    console.log(`\n(*) **** Package ${release} ****`);
     const opts = { stdio: 'inherit', cwd: stagingFolder, shell: true };
     console.log('(*) Packaging...');
     await utils.spawn('yarn', ['install'], opts);

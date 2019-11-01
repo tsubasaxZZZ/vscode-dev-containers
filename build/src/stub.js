@@ -21,7 +21,7 @@ module.exports = {
         }
         
         const userDockerFilePath = path.join(dotDevContainerPath, 'user.Dockerfile');
-        console.log(`(*) Generating ${userDockerFilePath}...`);
+        console.log('(*) Generating user.Dockerfile...');
         const templateDockerfile = isAlpine ? stubDockerFiles.alpine : stubDockerFiles.debian;
         const baseTag = utils.getBaseTag(definitionId);
         const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME',
