@@ -1,5 +1,5 @@
 {
-	"definitionsToRelease": [
+	"definitionsToPush": [
 		"debian-9-git"
 	],
 

@@ -35,7 +35,7 @@ module.exports = {
         const userDockerFile = await utils.readFile(userDockerFilePath);
 
         const baseTag = utils.getBaseTag(definitionId);
-        const userDockerFileModified = userDockerFile.replace(`${baseTag}:latest`,`${baseTag}:${version}`);
+        const userDockerFileModified = userDockerFile.replace(new RegExp(`${baseTag}:.+`),`${baseTag}:${version}`);
         await utils.writeFile(userDockerFilePath, userDockerFileModified);
     }
 };
