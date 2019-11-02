@@ -16,7 +16,7 @@ const utils = require('./utils');
     const opts = { stdio: 'inherit', cwd: stagingFolder, shell: true };
     console.log('(*) Packaging...');
     await utils.spawn('yarn', ['install'], opts);
-    await utils.spawn('npm', ['pack'], opts);
+    await utils.spawn('yarn', ['pack'], opts);
     console.log('(*) Copying package...');
     await utils.copyFiles(stagingFolder, ['*.tgz'], path.join(__dirname, '..', '..'));
 
