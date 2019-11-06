@@ -54,9 +54,14 @@ require('yargs')
                 default: '.'
             })
             .options({
-                'version': {
-                    describe: 'version to use in the stub',
-                    default: 'latest'
+                'release': {
+                    describe: 'release to use in the stub',
+                    default: 'master'
+                },
+                'has-base-dockerfile': {
+                    describe: 'whether base.Dockerfile exists',
+                    type: 'boolean',
+                    default: true
                 },
                 'alpine': {
                     describe: 'add an alpine container',
@@ -96,7 +101,7 @@ function packCommand(argv) {
 
 
 function stubCommand(argv) {
-    createStub(argv.devcontainer, argv.path, argv.version, argv.alpine)
+    createStub(argv.devcontainer, argv.path, argv.release, argv.hasBaseDockerfile, argv.alpine)
         .catch((reason) => {
             console.error(`(!) Stub generation failed - ${reason}`);
             process.exit(1);

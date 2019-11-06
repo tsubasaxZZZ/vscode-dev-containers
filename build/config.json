@@ -3,13 +3,10 @@
 	"definitionsToPush": [
 		"alpine-3.10-git",
 		"azure-functions-node-8",
-		"azure-functions-node-lts",
 		"debian-9-git",
 		"go",
 		"javascript-node-8",
-		"javascript-node-lts",
 		"typescript-node-8",
-		"typescript-node-lts",
 		"ubuntu-18.04-git"
 	],
 	"definitionsToSkip": [
@@ -27,5 +24,7 @@
 		".npmignore"
 	],
 	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
-	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers"
+	"dockerFilePreamble": "For information on the contents of the image referenced below, see the Dockerfile at",
+	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers",
+	"containersPathInRepo": "containers"
 }

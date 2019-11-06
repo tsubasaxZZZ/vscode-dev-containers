@@ -39,7 +39,9 @@ async function push(release, updateLatest, definitionId) {
 
 async function pushImage(definitionPath, definitionId, release, updateLatest) {
     const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
-    const dockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
+    // Use base.Dockerfile for image build if found, otherwise use Dockerfile
+    const baseDockerFileExists = await utils.exists(path.join(dotDevContainerPath, 'base.Dockerfile'));
+    const dockerFilePath = path.join(dotDevContainerPath, `${baseDockerFileExists ? 'base.' : ''}Dockerfile`);
 
     // Make sure there's a Dockerfile present
     if (!await utils.exists(dockerFilePath)) {
@@ -57,13 +59,6 @@ async function pushImage(definitionPath, definitionId, release, updateLatest) {
     const devContainerJsonRaw = await utils.readFile(devContainerJsonPath);
     const devContainerJson = jsonc.parse(devContainerJsonRaw);
 
-    // Add a header to the Dockerfile with a pointer to the image
-    console.log('(*) Adding header to Dockerfile...');
-    const dockerFileModified =
-        `# This file was used to generate ${utils.getBaseTag(definitionId)}:${version}\n`
-        + await utils.readFile(dockerFilePath);
-    await utils.writeFile(dockerFilePath, dockerFileModified);
-
     // Build
     console.log(`(*) Building image...`);
     const workingDir = path.resolve(dotDevContainerPath, devContainerJson.context || '.')
@@ -77,18 +72,18 @@ async function pushImage(definitionPath, definitionId, release, updateLatest) {
         await utils.spawn('docker', ['push', versionTags[i]], spawnOpts);
     }
 
-    // If user.Dockerfile not found, create it, otherwise update the version
-    if (!await utils.exists(path.join(dotDevContainerPath, 'user.Dockerfile'))) {
-        await stub.createStub(dotDevContainerPath, definitionId, version);
+    // If base.Dockerfile not found, create a stub, otherwise update the existing one
+    if (!baseDockerFileExists) {
+        await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
     } else {
-        await stub.updateStub(dotDevContainerPath, definitionId, version);
+        await stub.updateStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
     }    
 
-    // Change devcontainer.json to user.Dockerfile, add header
+    // Update devcontainer.json, add header
     console.log('(*) Updating devcontainer.json...');
     const devContainerJsonModified =
-        `// ${utils.getConfig('devContainerJsonPreamble')}\n// ${utils.getConfig('vscodeDevContainersRepo')}/tree/${release}/containers/${definitionId}\n`
-        + devContainerJsonRaw.replace('"Dockerfile"', '"user.Dockerfile"');
+        `// ${utils.getConfig('devContainerJsonPreamble')}\n// ${utils.getConfig('vscodeDevContainersRepo')}/tree/${release}/${utils.getConfig('containersPathInRepo')}/${definitionId}\n`
+        + devContainerJsonRaw.replace('"base.Dockerfile"', '"Dockerfile"');
     await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
 
     console.log('(*) Done!');
