@@ -13,7 +13,7 @@ async function push(release, updateLatest, definitionId) {
 
     const version = release.charAt(0) === 'v' ? release.substr(1) : release;
     const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', version);
-    console.log(`(*) Copying files to ${stagingFolder}`);
+    console.log(`(*) Copying files to ${stagingFolder}\n`);
     await utils.rimraf(stagingFolder); // Clean out folder if it exists
     await utils.mkdirp(stagingFolder); // Create the folder
     await utils.copyFiles(
@@ -22,16 +22,16 @@ async function push(release, updateLatest, definitionId) {
         stagingFolder);
 
     const definitionStagingFolder = path.join(stagingFolder, 'containers');
-    const definitions = definitionId ? [definitionId] : utils.getConfig('definitionsToPush', await utils.readdir(definitionStagingFolder));
-
-    for (let i = 0; i < definitions.length; i++) {
-        const definitionId = definitions[i];
-        if (utils.getConfig('definitionsToSkip', []).indexOf(definitionId) > -1) {
-            console.log(`(*) Skipping ${definitionId}...`);
-            return;
+    const allDefinitions = definitionId ? [definitionId] : await utils.readdir(definitionStagingFolder);
+    const definitionsToSkip = definitionId ? [] : utils.getConfig('definitionsToSkip', []);
+    const definitionsToPush = definitionId ? [definitionId] : utils.getConfig('definitionsToPush', allDefinitions.slice(0));
+    for (let i = 0; i < allDefinitions.length; i++) {
+        const currentDefinitionId = allDefinitions[i];
+        await annotateDevContainerJson(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release);
+        if(definitionsToSkip.indexOf(currentDefinitionId) < 0 && definitionsToPush.indexOf(currentDefinitionId) >= 0) {
+            console.log(`\n**** Pushing ${currentDefinitionId} ${release} ****`);
+            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, updateLatest);
         }
-        console.log(`\n**** Pushing ${definitionId} ${release} ****`);
-        await pushImage(path.join(definitionStagingFolder, definitionId), definitionId, release, updateLatest);
     }
 
     return stagingFolder;
@@ -72,21 +72,28 @@ async function pushImage(definitionPath, definitionId, release, updateLatest) {
         await utils.spawn('docker', ['push', versionTags[i]], spawnOpts);
     }
 
-    // If base.Dockerfile not found, create a stub, otherwise update the existing one
-    if (!baseDockerFileExists) {
-        await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
-    } else {
+    // If base.Dockerfile found, update stub/devcontainer.json, otherwise create
+    if (baseDockerFileExists) {
         await stub.updateStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
+        console.log('(*) Updating devcontainer.json...');
+        await utils.writeFile(devContainerJsonPath, devContainerJsonRaw.replace('"base.Dockerfile"', '"Dockerfile"'));
+    } else {
+        await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
     }    
 
-    // Update devcontainer.json, add header
-    console.log('(*) Updating devcontainer.json...');
-    const devContainerJsonModified =
-        `// ${utils.getConfig('devContainerJsonPreamble')}\n// ${utils.getConfig('vscodeDevContainersRepo')}/tree/${release}/${utils.getConfig('containersPathInRepo')}/${definitionId}\n`
-        + devContainerJsonRaw.replace('"base.Dockerfile"', '"Dockerfile"');
-    await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
+    console.log('(*) Done!\n');
+}
 
-    console.log('(*) Done!');
+async function annotateDevContainerJson(definitionPath, definitionId, release) {
+    // Look for context in devcontainer.json and use it to build the Dockerfile
+    console.log(`(*) Annotating devcontainer.json for ${definitionId}...`);
+    const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
+    const devContainerJsonPath = path.join(dotDevContainerPath, 'devcontainer.json');
+    const devContainerJsonRaw = await utils.readFile(devContainerJsonPath);
+    const devContainerJsonModified =
+        `// ${utils.getConfig('devContainerJsonPreamble')}\n// ${utils.getConfig('vscodeDevContainersRepo')}/tree/${release}/${utils.getConfig('containersPathInRepo')}/${definitionId}\n` +
+        devContainerJsonRaw;
+    await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
 }
 
 module.exports = {

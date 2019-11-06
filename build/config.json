@@ -17,7 +17,7 @@
 	    "alpine-3.10-git"
 	],
 	"filesToStage": [
-		"+(containers|repository-containers|LICENSE)/**/!(test-project)/*",
+		"+(containers|repository-containers)/**/!(test-project)/*",
 		"LICENSE",
 		"package.json",
 		"yarn.lock",
