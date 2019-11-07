@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Get Tag Name
       id: get_tag_name  
-      uses: olegtarasov/get-tag@j1
+      uses: olegtarasov/get-tag@v1
     - name: Log into Container Registry
       id: docker_login
       uses: azure/docker-login@v1
