@@ -47,6 +47,6 @@ jobs:
          # which include a `upload_url`. See this blog post for more info: 
          # https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
+        asset_path: ./vscode-dev-containers-*.tgz
         asset_name: vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
         asset_content_type: application/gzip 
