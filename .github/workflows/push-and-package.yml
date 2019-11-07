@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Push and Package
       run: |
-        docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.LOGIN_SERVER }}
+        docker login -u "${{ secrets.REGISTRY_USERNAME }}" -p "${{ secrets.REGISTRY_PASSWORD }}" "${{ secrets.LOGIN_SERVER }}"
         yarn install
         build/vscdc pack
         docker logout ${{ secrets.LOGIN_SERVER }}
