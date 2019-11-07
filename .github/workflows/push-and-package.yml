@@ -11,12 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}        
     - name: Push and Package
       run: |
         yarn install
-        docker login ${{ secrets.DOCKER_IMAGE_REPOSITORY_URI }} -u ${{ secrets.DOCKER_IMAGE_REPOSITORY_USER }} -p ${{ secrets.DOCKER_IMAGE_REPOSITORY_PWD }}
         build/vscdc pack
-        docker logout ${{ secrets.DOCKER_IMAGE_REPOSITORY_URI }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1.0.0
