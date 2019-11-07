@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Push and Package
       run: |
-        echo ${{ env.GITHUB_WORKSPACE }}
+        echo ${{ GITHUB_WORKSPACE }}
         yarn install
         build/vscdc pack
     - name: Create Release
@@ -47,6 +47,6 @@ jobs:
          # which include a `upload_url`. See this blog post for more info: 
          # https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ env.GITHUB_WORKSPACE }}/vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
+        asset_path: ${{ GITHUB_WORKSPACE }}/vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
         asset_name: vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
         asset_content_type: application/gzip 
