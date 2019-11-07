@@ -10,11 +10,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - name: Get Tag Name
+      id: get_tag_name  
+      uses: olegtarasov/get-tag@j1
+    - name: Log into Container Registry
+      id: docker_login
+      uses: azure/docker-login@v1
       with:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+    - name: Checkout
+      id: checkouy
+      uses: actions/checkout@v1
     - name: Push and Package
       run: |
         yarn install
@@ -30,7 +37,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload Release Asset
-      id: upload-release-asset 
+      id: upload_release_asset 
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,6 +46,6 @@ jobs:
          # which include a `upload_url`. See this blog post for more info: 
          # https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./vscode-dev-containers-${{ github.ref }}.tgz
-        asset_name: vscode-dev-containers-${{ github.ref }}.tgz
+        asset_path: ./vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
+        asset_name: vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
         asset_content_type: application/gzip 
