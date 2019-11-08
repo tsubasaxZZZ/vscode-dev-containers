@@ -126,7 +126,7 @@ module.exports = {
         const version = (release === 'master' ? 
             'latest' :
             (release.charAt(0) === 'v' ? release.substr(1) : release));
-        const versionParts = version.split(version, '.');
+        const versionParts = version.split('.');
         return `${versionParts[0]}.${versionParts[1]}`;
     },
 
