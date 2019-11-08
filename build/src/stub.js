@@ -10,30 +10,26 @@ const  alpineStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', '
 const  debianStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', 'alpine.Dockerfile'));
 
 module.exports = {
-    createStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists, isAlpine) {
-        const version = (release === 'master' ? 
-                'latest' :
-                (release.charAt(0) === 'v' ? release.substr(1) : release));
+    createStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser, isAlpine) {
         isAlpine = isAlpine || (utils.getConfig('alpineDefinitions',[]).indexOf(definitionId) > 0); 
         
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         console.log('(*) Generating user Dockerfile...');
         const templateDockerfile = isAlpine ? await alpineStubPromise : await debianStubPromise;
-        const baseTag = utils.getBaseTag(definitionId);
-        const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, baseTag, release, version, baseDockerFileExists));
+        const baseTag = utils.getBaseTag(definitionId, registry, registryUser);
+        const majorMinor = utils.majorMinorFromRelease(release);
+        const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, baseTag, release, majorMinor, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFile);
     },
 
-    updateStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists) {
-        const version = (release === 'master' ? 
-                'latest' :
-                (release.charAt(0) === 'v' ? release.substr(1) : release));
+    updateStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser) {
         console.log('(*) Updating user Dockerfile...');
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         const userDockerFile = await utils.readFile(userDockerFilePath);
 
-        const baseTag = utils.getBaseTag(definitionId);
-        const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM ${baseTag}:.+`), getFromSnippet(definitionId, baseTag, release, version, baseDockerFileExists));
+        const baseTag = utils.getBaseTag(definitionId, registry, registryUser);
+        const majorMinor = utils.majorMinorFromRelease(release);
+        const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM ${baseTag}:.+`), getFromSnippet(definitionId, baseTag, release, majorMinor, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFileModified);
     }
 };

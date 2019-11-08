@@ -1,12 +1,8 @@
 {
-	"username": "chuxel",
+	"registryUser": "vscode",
 	"definitionsToPush": [
 		"alpine-3.10-git",
-		"azure-functions-node-8",
 		"debian-9-git",
-		"go",
-		"javascript-node-8",
-		"typescript-node-8",
 		"ubuntu-18.04-git"
 	],
 	"definitionsToSkip": [

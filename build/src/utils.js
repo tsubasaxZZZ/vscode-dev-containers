@@ -26,9 +26,10 @@ function getConfig(property, defaultVal) {
     return process.env[envVar] || config[property] || defaultVal;
 }
 
-function getBaseTag(definitionId) {
-    const containerRepo = getConfig('containerRegistry', null);
-    return `${containerRepo ? containerRepo + '/' : ''}${getConfig('username')}/${definitionId}`;
+function getBaseTag(definitionId, registry, registryUser) {
+    registry = registry || getConfig('containerRegistry', 'docker.io');
+    registryUser = registryUser || getConfig('registryUser');
+    return `${registry}/${registryUser}/${definitionId}`;
 }
 
 module.exports = {
@@ -101,13 +102,13 @@ module.exports = {
         return fs.existsSync(filePath);
     },
 
-    getTagList: function(definitionId, version, updateLatest) {
+    getTagList: function(definitionId, version, updateLatest, registry, registryUser) {
         const versionParts = version.split('.');
         if (versionParts.length !== 3) {
             throw(`Invalid version format in ${version}.`);    
         }
 
-        const baseTag = getBaseTag(definitionId);
+        const baseTag = getBaseTag(definitionId, registry, registryUser);
         return updateLatest ?
             [
                 `${baseTag}:${versionParts[0]}`,
@@ -119,6 +120,14 @@ module.exports = {
                 `${baseTag}:${versionParts[0]}.${versionParts[1]}`,
                 `${baseTag}:${version}`
             ];
+    },
+
+    majorMinorFromRelease: function(release) {
+        const version = (release === 'master' ? 
+            'latest' :
+            (release.charAt(0) === 'v' ? release.substr(1) : release));
+        const versionParts = version.split(version, '.');
+        return `${versionParts[0]}.${versionParts[1]}`;
     },
 
     getBaseTag: getBaseTag,

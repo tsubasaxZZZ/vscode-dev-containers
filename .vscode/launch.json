@@ -10,7 +10,10 @@
             "name": "Run Push Script",
 			"program": "${workspaceFolder}/build/vscdc",
 			"args": [
-				"push"
+				"push",
+				"--release", "v0.0.1",
+				"--registry", "docker.io",
+				"--registryUser", "chuxel"
 			]
 		},
 		{
@@ -19,7 +22,10 @@
             "name": "Run Pack Script",
 			"program": "${workspaceFolder}/build/vscdc",
 			"args": [
-				"pack"
+				"pack",
+				"--release", "v0.0.1",
+				"--registry", "docker.io",
+				"--registryUser", "chuxel"
 			]
         }
 

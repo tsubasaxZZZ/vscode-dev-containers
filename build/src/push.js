@@ -9,7 +9,7 @@ const jsonc = require('jsonc').jsonc;
 const utils = require('./utils');
 const stub = require('./stub');
 
-async function push(release, updateLatest, definitionId) {
+async function push(release, updateLatest, registry, registryUser, definitionId) {
 
     const version = release.charAt(0) === 'v' ? release.substr(1) : release;
     const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', version);
@@ -30,14 +30,14 @@ async function push(release, updateLatest, definitionId) {
         await annotateDevContainerJson(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release);
         if(definitionsToSkip.indexOf(currentDefinitionId) < 0 && definitionsToPush.indexOf(currentDefinitionId) >= 0) {
             console.log(`\n**** Pushing ${currentDefinitionId} ${release} ****`);
-            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, updateLatest);
+            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, updateLatest, registry, registryUser);
         }
     }
 
     return stagingFolder;
 }
 
-async function pushImage(definitionPath, definitionId, release, updateLatest) {
+async function pushImage(definitionPath, definitionId, release, updateLatest, registry, registryUser) {
     const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
     // Use base.Dockerfile for image build if found, otherwise use Dockerfile
     const baseDockerFileExists = await utils.exists(path.join(dotDevContainerPath, 'base.Dockerfile'));
@@ -50,7 +50,7 @@ async function pushImage(definitionPath, definitionId, release, updateLatest) {
 
     // Determine tags to use
     const version = release.charAt(0) === 'v' ? release.substr(1) : release;
-    const versionTags = utils.getTagList(definitionId, version, updateLatest)
+    const versionTags = utils.getTagList(definitionId, version, updateLatest, registry, registryUser)
     console.log(`(*) Tags:${versionTags.reduce((prev, current) => prev += `\n     ${current}`, '')}`);
 
     // Look for context in devcontainer.json and use it to build the Dockerfile
@@ -74,11 +74,11 @@ async function pushImage(definitionPath, definitionId, release, updateLatest) {
 
     // If base.Dockerfile found, update stub/devcontainer.json, otherwise create
     if (baseDockerFileExists) {
-        await stub.updateStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
+        await stub.updateStub(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser);
         console.log('(*) Updating devcontainer.json...');
         await utils.writeFile(devContainerJsonPath, devContainerJsonRaw.replace('"base.Dockerfile"', '"Dockerfile"'));
     } else {
-        await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists);
+        await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser);
     }    
 
     console.log('(*) Done!\n');
