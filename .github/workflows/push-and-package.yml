@@ -36,8 +36,8 @@ jobs:
         sed -i -E "s/\"version\".?:.?\".+\"/\"version\": \"${PKG_VERSION}\"/g" package.json        
         
         # Push images and package
-        CONTAINER_REGISTRY=${{ secrets.REGISTRY }}
-        USERNAME=${{ secrets.REGISTRY_USERNAME }}
+        export CONTAINER_REGISTRY=${{ secrets.REGISTRY }}
+        export USERNAME=${{ secrets.REGISTRY_USERNAME }}
         yarn install
         build/vscdc pack
         
