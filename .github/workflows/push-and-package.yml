@@ -8,29 +8,39 @@ on:
 
 jobs:
   build:
+    
     runs-on: ubuntu-latest
+    
     steps:
+
     - name: Get Tag Name
       id: get_tag_name  
       uses: olegtarasov/get-tag@v1
-    - name: Log into Container Registry
+
+    - name: Container Registry Login
       id: docker_login
       uses: azure/docker-login@v1
       with:
+        loginServer: ${{ secrets.REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+
     - name: Checkout
-      id: checkouy
+      id: checkout
       uses: actions/checkout@v1
+      
     - name: Push and Package
       run: |
         # Match version to label - expects label of vX.X.X
         PKG_VERSION="${{ steps.get_tag_name.outputs.tag }}" && PKG_VERSION=${PKG_VERSION:1}
-        sed -i -E "s/\"version\".?:.?\".+\"/\"version\": \"${PKG_VERSION}\"/g" package.json
+        sed -i -E "s/\"version\".?:.?\".+\"/\"version\": \"${PKG_VERSION}\"/g" package.json        
         
         # Push images and package
+        CONTAINER_REGISTRY=${{ secrets.REGISTRY }}
+        USERNAME=${{ secrets.REGISTRY_USERNAME }}
         yarn install
         build/vscdc pack
+        
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1.0.0
@@ -41,6 +51,7 @@ jobs:
         release_name: ${{ github.ref }}
         draft: false
         prerelease: false
+
     - name: Upload Release Asset
       id: upload_release_asset 
       uses: actions/upload-release-asset@v1.0.1
