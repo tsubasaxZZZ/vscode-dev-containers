@@ -29,7 +29,7 @@ module.exports = {
 
         const baseTag = utils.getBaseTag(definitionId, registry, registryUser);
         const majorMinor = utils.majorMinorFromRelease(release);
-        const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM ${baseTag}:.+`), getFromSnippet(definitionId, baseTag, release, majorMinor, baseDockerFileExists));
+        const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM .+:.+`), getFromSnippet(definitionId, baseTag, release, majorMinor, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFileModified);
     }
 };
