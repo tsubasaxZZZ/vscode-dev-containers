@@ -6,7 +6,7 @@
 const path = require('path');
 const push = require('./push').push;
 const utils = require('./utils');
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
  async function package(release, updateLatest, registry, registryUser) {
 
