@@ -77,6 +77,8 @@ async function pushImage(definitionPath, definitionId, release, updateLatest, re
         await stub.updateStub(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser);
         console.log('(*) Updating devcontainer.json...');
         await utils.writeFile(devContainerJsonPath, devContainerJsonRaw.replace('"base.Dockerfile"', '"Dockerfile"'));
+        console.log('(*) Removing base.Dockerfile...');
+        await utils.rimraf(dockerFilePath);
     } else {
         await stub.createStub(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser);
     }    
