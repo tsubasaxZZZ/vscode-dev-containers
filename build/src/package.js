@@ -31,8 +31,8 @@ const packageJson = require('../../package.json');
     console.log('(*) Moving package...');
     // Output filename should use the release vX.X.X like yarn rather than just version like npm
     // since release tag includes the "v" and this is what is easily available during CI.
-    const outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${packageJson.version}`);
-    await utils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJson.version}`), outputPath);
+    const outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${packageJson.version}.tgz`);
+    await utils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJson.version}.tgz`), outputPath);
 
     // And finally clean up
     console.log('(*) Cleaning up...');
