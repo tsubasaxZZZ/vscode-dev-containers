@@ -26,10 +26,10 @@ function getConfig(property, defaultVal) {
     return process.env[envVar] || config[property] || defaultVal;
 }
 
-function getBaseTag(definitionId, registry, registryUser) {
+function getBaseTag(definitionId, registry, registryPath) {
     registry = registry || getConfig('containerRegistry', 'docker.io');
-    registryUser = registryUser || getConfig('registryUser');
-    return `${registry}/${registryUser}/${definitionId}`;
+    registryPath = registryPath || getConfig('registryUser');
+    return `${registry}/${registryPath}/${definitionId}`;
 }
 
 module.exports = {
@@ -102,13 +102,13 @@ module.exports = {
         return fs.existsSync(filePath);
     },
 
-    getTagList: function(definitionId, version, updateLatest, registry, registryUser) {
+    getTagList: function(definitionId, version, updateLatest, registry, registryPath) {
         const versionParts = version.split('.');
         if (versionParts.length !== 3) {
             throw(`Invalid version format in ${version}.`);    
         }
 
-        const baseTag = getBaseTag(definitionId, registry, registryUser);
+        const baseTag = getBaseTag(definitionId, registry, registryPath);
         return updateLatest ?
             [
                 `${baseTag}:${versionParts[0]}`,

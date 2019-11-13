@@ -21,12 +21,20 @@ require('yargs')
                     default: `v${packageJson.version}`
                 },
                 'registry': {
-                    describe: 'container registry to target',
+                    describe: 'container registry to push images to',
                     default: utils.getConfig('containerRegistry', 'docker.io')
                 },
-                'registry-user': {
-                    describe: 'container registry user',
-                    default: utils.getConfig('registryUser')
+                'registry-path': {
+                    describe: 'container registry path',
+                    default: utils.getConfig('containerRegistryPath', '')
+                },
+                'stub-registry': {
+                    describe: 'registry to add to stub',
+                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
+                },
+                'stub-registry-path': {
+                    describe: 'stub registry path',
+                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -47,12 +55,20 @@ require('yargs')
                     default: `v${packageJson.version}`
                 },
                 'registry': {
-                    describe: 'container registry to target',
+                    describe: 'container registry to push images to',
                     default: utils.getConfig('containerRegistry', 'docker.io')
                 },
-                'registry-user': {
-                    describe: 'container registry user',
-                    default: utils.getConfig('registryUser')
+                'registry-path': {
+                    describe: 'container registry path',
+                    default: utils.getConfig('containerRegistryPath', '')
+                },
+                'stub-registry': {
+                    describe: 'registry to add to stub',
+                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
+                },
+                'stub-registry-path': {
+                    describe: 'stub registry path',
+                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -75,13 +91,13 @@ require('yargs')
                     describe: 'release to use in the stub',
                     default: 'master'
                 },
-                'registry': {
-                    describe: 'container registry to target',
-                    default: utils.getConfig('containerRegistry', 'docker.io')
+                'stub-registry': {
+                    describe: 'registry to add to stub',
+                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
                 },
-                'registry-user': {
-                    describe: 'container registry user',
-                    default: utils.getConfig('registryUser')
+                'stub-registry-path': {
+                    describe: 'stub registry path',
+                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
                 },
                 'has-base-dockerfile': {
                     describe: 'whether base.Dockerfile exists',
@@ -104,7 +120,7 @@ function pushCommand(argv) {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
-    push(argv.release, argv.updateLatest, argv.registry, argv.registryUser, argv.devcontainer)
+    push(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.devcontainer)
         .catch((reason) => {
             console.error(`(!) Push failed - ${reason}`);
             process.exit(1);
@@ -117,7 +133,7 @@ function packCommand(argv) {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
-    package(argv.release, argv.updateLatest, argv.registry, argv.registryUser)
+    package(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath)
         .catch((reason) => {
             console.error(`(!) Packaging failed - ${reason}`);
             process.exit(1);
@@ -126,7 +142,7 @@ function packCommand(argv) {
 
 
 function stubCommand(argv) {
-    createStub(argv.devcontainer, argv.path, argv.release, argv.hasBaseDockerfile, argv.registry, argv.registryUser, argv.alpine)
+    createStub(argv.devcontainer, argv.path, argv.release, argv.hasBaseDockerfile, argv.stubRegistry, argv.stubRegistryPath, argv.alpine)
         .catch((reason) => {
             console.error(`(!) Stub generation failed - ${reason}`);
             process.exit(1);

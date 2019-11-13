@@ -10,13 +10,13 @@ const  alpineStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', '
 const  debianStubPromise = utils.readFile(path.join(__dirname, '..', 'assets', 'alpine.Dockerfile'));
 
 module.exports = {
-    createStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists, registry, registryUser, isAlpine) {
+    createStub: async function(dotDevContainerPath, definitionId, release, baseDockerFileExists, stubRegistry, stubRegistryPath, isAlpine) {
         isAlpine = isAlpine || (utils.getConfig('alpineDefinitions',[]).indexOf(definitionId) > 0); 
         
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         console.log('(*) Generating user Dockerfile...');
         const templateDockerfile = isAlpine ? await alpineStubPromise : await debianStubPromise;
-        const baseTag = utils.getBaseTag(definitionId, registry, registryUser);
+        const baseTag = utils.getBaseTag(definitionId, stubRegistry, stubRegistryPath);
         const majorMinor = utils.majorMinorFromRelease(release);
         const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, baseTag, release, majorMinor, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFile);

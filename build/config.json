@@ -1,5 +1,8 @@
 {
-	"registryUser": "vscode",
+	"containerRegistry": "docker.io",
+	"containerRegistryPath": "vscode",
+	"stubRegistry": "docker.io",
+	"stubRegistryPath": "vscode",
 	"definitionsToPush": [
 		"alpine-3.10-git",
 		"debian-9-git",
