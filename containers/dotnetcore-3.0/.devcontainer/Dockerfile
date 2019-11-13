@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
 #-------------------------------------------------------------------------------------------------------------
 
-FROM docker.io/chuxel/dotnetcore-3.0:latest
+FROM docker.io/chuxel/dotnetcore-3.0:dev
 
 # This image comes with a base non-root user with sudo access. However, for Linux, 
 # this user's GID/UID must match your local user UID/GID to avoid permission issues 

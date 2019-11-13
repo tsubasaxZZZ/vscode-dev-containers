@@ -13,7 +13,7 @@ async function push(release, updateLatest, registry, registryPath, stubRegistry,
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
-    const version = release.charAt(0) === 'v' ? release.substr(1) : release;
+    const version = utils.getVersionFromRelease(release);
     const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', version);
     console.log(`(*) Copying files to ${stagingFolder}\n`);
     await utils.rimraf(stagingFolder); // Clean out folder if it exists
@@ -51,8 +51,7 @@ async function pushImage(definitionPath, definitionId, release, updateLatest, re
     }
 
     // Determine tags to use
-    const version = release.charAt(0) === 'v' ? release.substr(1) : release;
-    const versionTags = utils.getTagList(definitionId, version, updateLatest, registry, registryPath)
+    const versionTags = utils.getTagList(definitionId, release, updateLatest, registry, registryPath)
     console.log(`(*) Tags:${versionTags.reduce((prev, current) => prev += `\n     ${current}`, '')}`);
 
     // Look for context in devcontainer.json and use it to build the Dockerfile

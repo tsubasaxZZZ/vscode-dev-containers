@@ -19,10 +19,11 @@ const packageJson = require('../../package.json');
     console.log(`\n(*) **** Package ${release} ****`);
 
     console.log(`(*) Updating package.json with release version...`);
-    const version = release.charAt(0) === 'v' ? release.substr(1) : release;
+    const version = utils.getVersionFromRelease(release);
+    const packageJsonVersion = version === 'dev' ? packageJson.version + '-dev' : version;
     const packageJsonPath = path.join(stagingFolder, 'package.json');
     const packageJsonRaw = await utils.readFile(packageJsonPath);
-    const packageJsonModified = packageJsonRaw.replace(/"version".?:.?".+"/, `"version": "${version}"`);
+    const packageJsonModified = packageJsonRaw.replace(/"version".?:.?".+"/, `"version": "${packageJsonVersion}"`);
     await utils.writeFile(packageJsonPath, packageJsonModified);
 
     console.log('(*) Packaging...');
@@ -33,8 +34,8 @@ const packageJson = require('../../package.json');
     console.log('(*) Moving package...');
     // Output filename should use the release vX.X.X like yarn rather than just version like npm
     // since release tag includes the "v" and this is what is easily available during CI.
-    const outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${version}.tgz`);
-    await utils.rename(path.join(stagingFolder, `${packageJson.name}-${version}.tgz`), outputPath);
+    const outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${packageJsonVersion}.tgz`);
+    await utils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJsonVersion}.tgz`), outputPath);
 
     // And finally clean up
     console.log('(*) Cleaning up...');

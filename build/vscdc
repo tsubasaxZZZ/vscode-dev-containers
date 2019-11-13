@@ -116,7 +116,7 @@ require('yargs')
     .argv;
 
 function pushCommand(argv) {
-    if (argv.release.charAt(0) !== 'v') {
+    if (argv.release.charAt(0) !== 'v' && argv.release !== 'dev') {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
@@ -129,7 +129,7 @@ function pushCommand(argv) {
 
 
 function packCommand(argv) {
-    if (argv.release.charAt(0) !== 'v') {
+    if (argv.release.charAt(0) !== 'v' && argv.release !== 'dev') {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
