@@ -23,9 +23,9 @@ jobs:
       id: checkout
       uses: actions/checkout@v1
       
-    - name: Push and Package
+    - name: Push "dev" and Test Packaging
       run: |
-        # Push images and package
+        # Push dev images and package
         set -e
         yarn install
         build/vscdc pack --release dev --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }} --stub-registry ${{ secrets.STUB_REGISTRY }} --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
