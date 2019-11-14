@@ -1,8 +1,6 @@
 {
-	"containerRegistry": "docker.io",
-	"containerRegistryPath": "vscode",
-	"stubRegistry": "docker.io",
-	"stubRegistryPath": "vscode",
+	"containerRegistry": "devcon.azurecr.io",
+	"containerRegistryPath": "devcontainers",
 	"definitionsToPush": [
 		"alpine-3.10-git",
 		"debian-9-git",

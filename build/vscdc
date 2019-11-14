@@ -17,7 +17,7 @@ require('yargs')
         yargs
             .options({
                 'release': {
-                    describe: 'vscode-dev-containers release tag',
+                    describe: 'vscode-dev-containers release tag or "dev"',
                     default: `v${packageJson.version}`
                 },
                 'registry': {
@@ -35,6 +35,11 @@ require('yargs')
                 'stub-registry-path': {
                     describe: 'stub registry path',
                     default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
+                },
+                'simulate': {
+                    describe: 'whether to simulate a push instead of doing it',
+                    type: 'boolean',
+                    default: false
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -51,7 +56,7 @@ require('yargs')
             })
             .options({
                 'release': {
-                    describe: 'vscode-dev-containers release tag',
+                    describe: 'vscode-dev-containers release tag or "dev"',
                     default: `v${packageJson.version}`
                 },
                 'registry': {
@@ -74,6 +79,11 @@ require('yargs')
                     describe: 'whether to tag latest and {MAJOR}',
                     type: 'boolean',
                     default: true
+                },
+                'simulate': {
+                    describe: 'whether to simulate a push instead of doing it',
+                    type: 'boolean',
+                    default: false
                 }
             })
     }, pushCommand)
@@ -88,8 +98,8 @@ require('yargs')
             })
             .options({
                 'release': {
-                    describe: 'release to use in the stub',
-                    default: 'master'
+                    describe: 'vscode-dev-containers release tag or "dev"',
+                    default: 'dev'
                 },
                 'stub-registry': {
                     describe: 'registry to add to stub',
@@ -120,7 +130,7 @@ function pushCommand(argv) {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
-    push(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.devcontainer)
+    push(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.simulate, argv.devcontainer)
         .catch((reason) => {
             console.error(`(!) Push failed - ${reason}`);
             process.exit(1);
@@ -133,7 +143,7 @@ function packCommand(argv) {
         console.error(`(!) Invalid release identifier ${argv.release}. Valid form: v{MAJOR}.{MINOR}.{FIX}`);
         process.exit(1);
     }
-    package(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath)
+    package(argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.simulate)
         .catch((reason) => {
             console.error(`(!) Packaging failed - ${reason}`);
             process.exit(1);

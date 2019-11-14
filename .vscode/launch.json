@@ -11,9 +11,7 @@
 			"program": "${workspaceFolder}/build/vscdc",
 			"args": [
 				"push",
-				"--release", "v0.0.1",
-				"--registry", "docker.io",
-				"--registry-path", "chuxel",
+				"--release", "dev",
 				"--stub-registry", "mcr.microsoft.com",
 				"--stub-registry-path", "devcontainers"
 			]
@@ -25,9 +23,7 @@
 			"program": "${workspaceFolder}/build/vscdc",
 			"args": [
 				"pack",
-				"--release", "v0.0.1",
-				"--registry", "docker.io",
-				"--registry-path", "chuxel",
+				"--release", "dev",
 				"--stub-registry", "mcr.microsoft.com",
 				"--stub-registry-path", "devcontainers"
 			]

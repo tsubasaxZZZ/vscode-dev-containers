@@ -8,12 +8,12 @@ const push = require('./push').push;
 const utils = require('./utils');
 const packageJson = require('../../package.json');
 
- async function package(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath) {
+async function package(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate) {
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
     // First, push images, update content
-    const stagingFolder = await push(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath);
+    const stagingFolder = await push(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
  
     // Then package
     console.log(`\n(*) **** Package ${release} ****`);
@@ -31,11 +31,16 @@ const packageJson = require('../../package.json');
     await utils.spawn('yarn', ['install'], opts);
     await utils.spawn('npm', ['pack'], opts); // Need to use npm due to https://github.com/yarnpkg/yarn/issues/685
     
-    console.log('(*) Moving package...');
-    // Output filename should use the release vX.X.X like yarn rather than just version like npm
-    // since release tag includes the "v" and this is what is easily available during CI.
-    const outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${packageJsonVersion}.tgz`);
-    await utils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJsonVersion}.tgz`), outputPath);
+    let outputPath = null;
+    if (simulate) {
+        console.log('(*) Simulating: Skipping package move.');
+    } else {
+        console.log('(*) Moving package...');
+        // Output filename should use the release vX.X.X like yarn rather than just version like npm
+        // since release tag includes the "v" and this is what is easily available during CI.
+        outputPath = path.join(__dirname, '..', '..', `${packageJson.name}-v${packageJsonVersion}.tgz`);
+        await utils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJsonVersion}.tgz`), outputPath);    
+    }
 
     // And finally clean up
     console.log('(*) Cleaning up...');

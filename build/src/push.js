@@ -9,7 +9,7 @@ const jsonc = require('jsonc').jsonc;
 const utils = require('./utils');
 const stub = require('./stub');
 
-async function push(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, definitionId) {
+async function push(release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate, definitionId) {
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
@@ -32,14 +32,14 @@ async function push(release, updateLatest, registry, registryPath, stubRegistry,
         await annotateDevContainerJson(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release);
         if(definitionsToSkip.indexOf(currentDefinitionId) < 0 && definitionsToPush.indexOf(currentDefinitionId) >= 0) {
             console.log(`\n**** Pushing ${currentDefinitionId} ${release} ****`);
-            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath);
+            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
         }
     }
 
     return stagingFolder;
 }
 
-async function pushImage(definitionPath, definitionId, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath) {
+async function pushImage(definitionPath, definitionId, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate) {
     const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
     // Use base.Dockerfile for image build if found, otherwise use Dockerfile
     const baseDockerFileExists = await utils.exists(path.join(dotDevContainerPath, 'base.Dockerfile'));
@@ -68,9 +68,13 @@ async function pushImage(definitionPath, definitionId, release, updateLatest, re
     await utils.spawn('docker', ['build', workingDir, '-f', dockerFilePath].concat(buildParams), spawnOpts);
 
     // Push
-    console.log(`(*) Pushing ${definitionId}...`);
-    for (let i = 0; i < versionTags.length; i++) {
-        await utils.spawn('docker', ['push', versionTags[i]], spawnOpts);
+    if(simulate) {
+        console.log(`(*) Simulating: Skipping push to registry.`);
+    } else {
+        console.log(`(*) Pushing ${definitionId}...`);
+        for (let i = 0; i < versionTags.length; i++) {
+            await utils.spawn('docker', ['push', versionTags[i]], spawnOpts);
+        }    
     }
 
     // If base.Dockerfile found, update stub/devcontainer.json, otherwise create
