@@ -24,7 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Configure apt and install packages
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
+    && apt-get -y install --no-install-recommends apt-utils dialog curl 2>&1 \
     #
     # Verify git, common tools / libs installed, add/modify non-root user, optionally install zsh
     && curl -sSL -o /tmp/common-setup.sh $COMMON_SCRIPT_SOURCE \
