@@ -27,14 +27,14 @@
 		"yarn.lock",
 		".npmignore"
 	],
-	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
-	"dockerFilePreamble": "For information on the contents of the image referenced below, see the Dockerfile at",
-	"vscodeDevContainersRepo": "microsoft/vscode-dev-containers",
+	"githubRepoName": "microsoft/vscode-dev-containers",
 	"containersPathInRepo": "containers",
 	"scriptLibraryPathInRepo": "script-library",
-	"commonScriptMapping": {
+	"commonScriptNames": {
 		"debian": "common-debian.sh",
 		"alpine": "common-alpine.sh",
 		"redhat": "common-redhat.sh"
-	}
+	},
+	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
+	"dockerFilePreamble": "For information on the contents of the image referenced below, see the Dockerfile at"
 }

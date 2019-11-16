@@ -26,7 +26,7 @@ require('yargs')
                 },
                 'registry-path': {
                     describe: 'container registry path',
-                    default: utils.getConfig('containerRegistryPath', '')
+                    default: utils.getConfig('containerRegistryPath', 'vscode/devcontainers')
                 },
                 'stub-registry': {
                     describe: 'registry to add to stub',
@@ -43,7 +43,7 @@ require('yargs')
                 },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
-                    default: utils.getConfig('vscodeDevContainersRepo', 'https://github.com/microsoft/vscode-dev-containers')
+                    default: utils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -139,7 +139,6 @@ function pushCommand(argv) {
             process.exit(1);
         });
 }
-
 
 function packCommand(argv) {
     package(argv.githubRepo, argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.simulate)

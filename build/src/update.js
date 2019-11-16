@@ -6,27 +6,24 @@
 const path = require('path');
 const utils = require('./utils');
 
-const commonScriptMapping = utils.getConfig('commonScriptMapping', {});
-
-const commonScriptPath = path.join(__dirname, '..', '..', 'script-library');
-const alpineCommonScriptSHAPromise = utils.shaForFile(path.join(commonScriptPath, commonScriptMapping.alpine));
-const debianCommonScriptSHAPromise = utils.shaForFile(path.join(commonScriptPath, commonScriptMapping.debian));
-const redhatCommonScriptSHAPromise = utils.shaForFile(path.join(commonScriptPath, commonScriptMapping.redhat));
+const commonScriptNames = utils.getConfig('commonScriptNames', {});
+const commonScriptPath = path.join(__dirname, '..', '..', utils.getConfig('scriptLibraryPathInRepo', 'script-library'));
+const commonScriptSHAPromises = {
+    alpine: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.alpine)),
+    debian: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.debian)),
+    readhat: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.redhat))
+}
 
 const assetsPath = path.join(__dirname, '..', 'assets');
-const alpineStubPromise = utils.readFile(path.join(assetsPath, 'debian.Dockerfile'));
-const debianStubPromise = utils.readFile(path.join(assetsPath, 'alpine.Dockerfile'));
-const redhatStubPromise = utils.readFile(path.join(assetsPath, 'redhat.Dockerfile'));
+const stubPromises = {
+    alpine: utils.readFile(path.join(assetsPath, 'alpine.Dockerfile')),
+    debian: utils.readFile(path.join(assetsPath, 'debian.Dockerfile')),
+    redhat: utils.readFile(path.join(assetsPath, 'redhat.Dockerfile'))
+}
 
 async function updateDockerFileSetupScript(devContainerDockerfilePath, definitionId, repo, release) {
-    const commonScriptName = utils.objectByDefinitionLinuxDistro(definitionId, 
-        commonScriptMapping.debian, 
-        commonScriptMapping.alpine, 
-        commonScriptMapping.redhat); 
-    const commonScriptSHA = utils.objectByDefinitionLinuxDistro(definitionId, 
-        await debianCommonScriptSHAPromise, 
-        await alpineCommonScriptSHAPromise, 
-        await redhatCommonScriptSHAPromise); 
+    const commonScriptName = utils.objectByDefinitionLinuxDistro(definitionId, commonScriptNames);
+    const commonScriptSHA = await utils.objectByDefinitionLinuxDistro(definitionId, commonScriptSHAPromises);
     const devContainerDockerfileRaw = await utils.readFile(devContainerDockerfilePath);
     const devContainerDockerfileModified = devContainerDockerfileRaw
         .replace('COMMON_SCRIPT_SHA="none"', `COMMON_SCRIPT_SHA="${commonScriptSHA}"`)
@@ -44,11 +41,7 @@ module.exports = {
     createStub: async function(dotDevContainerPath, definitionId, repo, release, baseDockerFileExists, stubRegistry, stubRegistryPath) {
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         console.log('(*) Generating user Dockerfile...');
-        const templateDockerfile = utils.objectByDefinitionLinuxDistro(
-            definitionId,
-            await debianStubPromise,
-            await alpineStubPromise,
-            await redhatStubPromise)
+        const templateDockerfile = await utils.objectByDefinitionLinuxDistro(definitionId, stubPromises);
         const baseTag = utils.getBaseTag(definitionId, stubRegistry, stubRegistryPath);
         const majorMinor = utils.majorMinorFromRelease(release);
         const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, baseTag, repo, release, majorMinor, baseDockerFileExists));
@@ -77,7 +70,7 @@ module.exports = {
             devContainerJsonRaw;
         await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
 
-        await updateDockerFileSetupScript(path.join('dotDevContainerPath', 'Dockerfile'), definitionId, repo, release);
+        await updateDockerFileSetupScript(path.join(dotDevContainerPath, 'Dockerfile'), definitionId, repo, release);
     },
 
     updateDockerFileSetupScript: updateDockerFileSetupScript

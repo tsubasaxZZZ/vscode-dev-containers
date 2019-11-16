@@ -42,6 +42,16 @@ function getVersionFromRelease(release) {
     return 'dev';
 }
 
+function getLinuxDistroForDefinition(definitionId) {
+    if (getConfig('alpineDefinitions',[]).indexOf(definitionId) > 0) {
+        return 'alpine';
+    }
+    if (getConfig('redhatDefinitions',[]).indexOf(definitionId) > 0) {
+        return 'redhat';
+    }
+    return 'debian';
+}
+
 function getBaseTag(definitionId, registry, registryPath) {
     registry = registry || getConfig('containerRegistry', 'docker.io');
     registryPath = registryPath || getConfig('registryUser');
@@ -171,15 +181,13 @@ module.exports = {
         })
     },
 
-    objectByDefinitionLinuxDistro: (definitionId, debian, alpine, redhat) =>{
-        if (getConfig('alpineDefinitions',[]).indexOf(definitionId) > 0) {
-            return alpine;
-        }
-        if (getConfig('redhatDefinitions',[]).indexOf(definitionId) > 0) {
-            return redhat;
-        }
-        return debian;
+    objectByDefinitionLinuxDistro: (definitionId, objectsByDistro) =>{
+        const distro = getLinuxDistroForDefinition(definitionId);
+        const obj = objectsByDistro[distro];
+        return obj;
     },
+
+    getLinuxDistroForDefinition: getLinuxDistroForDefinition,
 
     getVersionFromRelease: getVersionFromRelease,
 
