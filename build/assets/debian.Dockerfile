@@ -17,8 +17,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # [Optional] Update UID/GID if needed and install additional software
 RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
-        if [ "$USER_GID" != "1000" ]; then sudo groupmod 1000 --gid $USER_GID; fi \
-        && if [ "$USER_UID" != "1000" ]; then sudo usermod --uid $USER_UID node; fi; \
+        sudo groupmod 1000 --gid $USER_GID \
+        && sudo usermod --uid $USER_UID --gid $USER_GID 1000 \
     fi \
     #
     # ***************************************************************

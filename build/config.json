@@ -1,6 +1,6 @@
 {
 	"containerRegistry": "devcon.azurecr.io",
-	"containerRegistryPath": "dev/devcontainers",
+	"containerRegistryPath": "vscode/devcontainers",
 	"definitionsToPush": [
 		"alpine-3.10-git",
 		"debian-9-git",
@@ -17,6 +17,9 @@
 	"alpineDefinitions": [
 	    "alpine-3.10-git"
 	],
+	"redhatDefinitions": [
+	    "java-12"
+	],
 	"filesToStage": [
 		"+(containers|repository-containers)/**/!(test-project)/*",
 		"LICENSE",
@@ -26,6 +29,12 @@
 	],
 	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
 	"dockerFilePreamble": "For information on the contents of the image referenced below, see the Dockerfile at",
-	"vscodeDevContainersRepo": "https://github.com/microsoft/vscode-dev-containers",
-	"containersPathInRepo": "containers"
+	"vscodeDevContainersRepo": "microsoft/vscode-dev-containers",
+	"containersPathInRepo": "containers",
+	"scriptLibraryPathInRepo": "script-library",
+	"commonScriptMapping": {
+		"debian": "common-debian.sh",
+		"alpine": "common-alpine.sh",
+		"redhat": "common-redhat.sh"
+	}
 }

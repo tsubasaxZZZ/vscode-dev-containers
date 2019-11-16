@@ -12,11 +12,10 @@ FROM REPLACE-ME
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# [Optional] Update UID/GID if needed
+# [Optional] Update UID/GID if needed and install additional software
 RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
-        sudo apk add --no-cache shadow \
-        && sudo groupmod 1000 --gid $USER_GID; fi \
-        && sudo usermod --uid $USER_UID --gid $USER_GID 1000; fi; \
+        sudo groupmod 1000 --gid $USER_GID \
+        && sudo usermod --uid $USER_UID --gid $USER_GID 1000 \
     fi
 
 # ***************************************************************
