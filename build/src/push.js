@@ -37,8 +37,10 @@ async function push(repo, release, updateLatest, registry, registryPath, stubReg
     const allDefinitions = definitionId ? [definitionId] : await utils.readdir(definitionStagingFolder);
     for (let i = 0; i < allDefinitions.length; i++) {
         const currentDefinitionId = allDefinitions[i];
-        await update.updateConfigForRelease(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, registry, registryPath, stubRegistry, stubRegistryPath);
+        await update.updateConfigForRelease(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath);
     }
+
+    console.log('(*) Done!\n');
 
     return stagingFolder;
 }

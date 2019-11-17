@@ -22,6 +22,7 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
 # ***************************************************************
 # * Add steps for installing any other needed dependencies here *
 # ***************************************************************
+# RUN sudo apk add add --no-cache <your-package-name-here>
 
 # Uncomment to default to non-root user
 # USER $USER_UID

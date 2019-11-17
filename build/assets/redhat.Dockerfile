@@ -21,6 +21,10 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
 # ***************************************************************
 # * Add steps for installing any other needed dependencies here *
 # ***************************************************************
+# RUN sudo yum -y install <your-package-name-here> \
+#     # 
+#     # Clean up
+#     && sudo yum clean all
 
 # Uncomment to default to non-root user
 # USER $USER_UID

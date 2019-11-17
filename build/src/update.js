@@ -79,7 +79,7 @@ module.exports = {
 
     updateConfigForRelease: async function (definitionPath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath) {
         // Look for context in devcontainer.json and use it to build the Dockerfile
-        console.log(`(*) Making version specific updates for for ${definitionId}...`);
+        console.log(`(*) Making version specific updates to ${definitionId}...`);
         const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
         const devContainerJsonPath = path.join(dotDevContainerPath, 'devcontainer.json');
         const devContainerJsonRaw = await utils.readFile(devContainerJsonPath);
@@ -89,7 +89,10 @@ module.exports = {
         await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
 
         // Replace version specific content in Dockerfile
-        await prepDockerFile(path.join(dotDevContainerPath, 'Dockerfile'), definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, false);
+        const dockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
+        if(await utils.exists(dockerFilePath)) {
+            await prepDockerFile(dockerFilePath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, false);
+        }
     },
 
     prepDockerFile: prepDockerFile

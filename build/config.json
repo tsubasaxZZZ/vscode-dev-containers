@@ -35,6 +35,6 @@
 		"alpine": "common-alpine.sh",
 		"redhat": "common-redhat.sh"
 	},
-	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at",
-	"dockerFilePreamble": "For information on the contents of the image referenced below, see the Dockerfile at"
+	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:",
+	"dockerFilePreamble": "For information on the contents of the container image below, see following Dockerfile:"
 }
