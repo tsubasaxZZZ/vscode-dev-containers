@@ -21,19 +21,37 @@ const stubPromises = {
     redhat: utils.readFile(path.join(assetsPath, 'redhat.Dockerfile'))
 }
 
-async function updateDockerFileSetupScript(devContainerDockerfilePath, definitionId, repo, release) {
+const containersPathInRepo = utils.getConfig('containersPathInRepo');
+const scriptLibraryPathInRepo = utils.getConfig('scriptLibraryPathInRepo');
+
+// Use configured stub registry regardless of arguments since this is what is in files
+const expectedRegistryPath = `${utils.getConfig('stubRegistry', 'mcr.microsoft.com')}/${utils.getConfig('stubRegistryPath', 'vscode/devcontainers')}`;
+
+async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, isForBuild) {
+    // Use exact version of building, MAJOR.MINOR if not
+    const version = isForBuild ? utils.getVersionFromRelease(release) : utils.majorMinorFromRelease(release);
+   
+    // If for building, use registry not stub registry
+    const targetRegistryPath = `${isForBuild ? registry : stubRegistry}/${isForBuild ? registryPath : stubRegistryPath}`
+
+    // Get script SHA and name
     const commonScriptName = utils.objectByDefinitionLinuxDistro(definitionId, commonScriptNames);
     const commonScriptSHA = await utils.objectByDefinitionLinuxDistro(definitionId, commonScriptSHAPromises);
+    
     const devContainerDockerfileRaw = await utils.readFile(devContainerDockerfilePath);
-    const devContainerDockerfileModified = devContainerDockerfileRaw
+    let devContainerDockerfileModified = devContainerDockerfileRaw
         .replace('COMMON_SCRIPT_SHA="none"', `COMMON_SCRIPT_SHA="${commonScriptSHA}"`)
-        .replace(/COMMON_SCRIPT_SOURCE=".+"/, `COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/${repo}/${release}/${utils.getConfig('scriptLibraryPathInRepo')}/${commonScriptName}"`);
+        .replace(/COMMON_SCRIPT_SOURCE=".+"/, `COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/${repo}/${release}/${scriptLibraryPathInRepo}/${commonScriptName}"`);
+    const captureGroups = new RegExp(`FROM (${expectedRegistryPath.replace('.','\\.')})/(.+):(.+)`).exec(devContainerDockerfileRaw);
+    if (captureGroups) {
+        devContainerDockerfileModified = devContainerDockerfileModified.replace(captureGroups[0],`FROM ${targetRegistryPath}/${captureGroups[2]}:${version}`)
+    }
     await utils.writeFile(devContainerDockerfilePath, devContainerDockerfileModified)
 }
 
 function getFromSnippet(definitionId, baseTag, repo, release, version, baseDockerFileExists) {
     return `# ${utils.getConfig('dockerFilePreamble')}\n` +
-        `# https://github.com/${repo}/tree/${release}/${utils.getConfig('containersPathInRepo')}/${definitionId}/.devcontainer/${baseDockerFileExists ? 'base.' : ''}Dockerfile\n` +
+        `# https://github.com/${repo}/tree/${release}/${containersPathInRepo}/${definitionId}/.devcontainer/${baseDockerFileExists ? 'base.' : ''}Dockerfile\n` +
         `FROM ${baseTag}:${version}`;
 }
 
@@ -48,32 +66,33 @@ module.exports = {
         await utils.writeFile(userDockerFilePath, userDockerFile);
     },
 
-    updateStub: async function(dotDevContainerPath, definitionId, repo, release, baseDockerFileExists, registry, registryUser) {
+    updateStub: async function(dotDevContainerPath, definitionId, repo, release, baseDockerFileExists, registry, registryPath) {
         console.log('(*) Updating user Dockerfile...');
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         const userDockerFile = await utils.readFile(userDockerFilePath);
 
-        const baseTag = utils.getBaseTag(definitionId, registry, registryUser);
+        const baseTag = utils.getBaseTag(definitionId, registry, registryPath);
         const majorMinor = utils.majorMinorFromRelease(release);
         const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM .+:.+`), getFromSnippet(definitionId, baseTag, repo, release, majorMinor, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFileModified);
     },
 
-    updateConfigForRelease: async function (definitionPath, definitionId, repo, release) {
+    updateConfigForRelease: async function (definitionPath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath) {
         // Look for context in devcontainer.json and use it to build the Dockerfile
         console.log(`(*) Making version specific updates for for ${definitionId}...`);
         const dotDevContainerPath = path.join(definitionPath, '.devcontainer');
         const devContainerJsonPath = path.join(dotDevContainerPath, 'devcontainer.json');
         const devContainerJsonRaw = await utils.readFile(devContainerJsonPath);
         const devContainerJsonModified =
-            `// ${utils.getConfig('devContainerJsonPreamble')}\n// https://raw.githubusercontent.com/${repo}/tree/${release}/${utils.getConfig('containersPathInRepo')}/${definitionId}\n` +
+            `// ${utils.getConfig('devContainerJsonPreamble')}\n// https://github.com/${repo}/tree/${release}/${containersPathInRepo}/${definitionId}\n` +
             devContainerJsonRaw;
         await utils.writeFile(devContainerJsonPath, devContainerJsonModified);
 
-        await updateDockerFileSetupScript(path.join(dotDevContainerPath, 'Dockerfile'), definitionId, repo, release);
+        // Replace version specific content in Dockerfile
+        await prepDockerFile(path.join(dotDevContainerPath, 'Dockerfile'), definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, false);
     },
 
-    updateDockerFileSetupScript: updateDockerFileSetupScript
+    prepDockerFile: prepDockerFile
 }
 
 

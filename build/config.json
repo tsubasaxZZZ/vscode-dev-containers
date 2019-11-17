@@ -1,19 +1,19 @@
 {
 	"containerRegistry": "devcon.azurecr.io",
-	"containerRegistryPath": "vscode/devcontainers",
-	"definitionsToPush": [
-		"alpine-3.10-git",
-		"debian-9-git",
-		"javascript-node-10",
-		"javascript-node-12",
-		"typescript-node-10",
-		"typescript-node-12",
-		"ubuntu-18.04-git"
-	],
-	"definitionsToSkip": [
-		"docker-existing-docker-compose",
-		"docker-existing-dockerfile"
-	],
+	"containerRegistryPath": "public/vscode/devcontainers",
+	"stubRegistry": "mcr.microsoft.com",
+	"stubRegistryPath": "vscode/devcontainers",
+	"definitionBuildGraph": {
+		"javascript-node-10": {
+			"typescript-node-10": true
+		},
+		"javascript-node-12": {
+			"typescript-node-12": true
+		},
+		"alpine-3.10-git": true,
+		"debian-9-git": true,
+		"ubuntu-18.04-git": true
+	},
 	"alpineDefinitions": [
 	    "alpine-3.10-git"
 	],

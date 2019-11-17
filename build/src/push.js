@@ -24,16 +24,20 @@ async function push(repo, release, updateLatest, registry, registryPath, stubReg
         stagingFolder);
 
     const definitionStagingFolder = path.join(stagingFolder, 'containers');
+
+    // Build and push subset of images
+    const definitionsToPush = definitionId ? [definitionId] : getDefinitionsToPush();
+    for (let i = 0; i < definitionsToPush.length; i++) {
+        const currentDefinitionId = definitionsToPush[i];
+        console.log(`**** Pushing ${currentDefinitionId} ${release} ****`);
+        await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
+    }
+
+    // Update all definition config files for release (devcontainer.json, Dockerfile)
     const allDefinitions = definitionId ? [definitionId] : await utils.readdir(definitionStagingFolder);
-    const definitionsToSkip = definitionId ? [] : utils.getConfig('definitionsToSkip', []);
-    const definitionsToPush = definitionId ? [definitionId] : utils.getConfig('definitionsToPush', allDefinitions.slice(0));
     for (let i = 0; i < allDefinitions.length; i++) {
         const currentDefinitionId = allDefinitions[i];
-        if(definitionsToSkip.indexOf(currentDefinitionId) < 0 && definitionsToPush.indexOf(currentDefinitionId) >= 0) {
-            console.log(`\n**** Pushing ${currentDefinitionId} ${release} ****`);
-            await pushImage(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
-        }
-        await update.updateConfigForRelease(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release);
+        await update.updateConfigForRelease(path.join(definitionStagingFolder, currentDefinitionId), currentDefinitionId, release, registry, registryPath, stubRegistry, stubRegistryPath);
     }
 
     return stagingFolder;
@@ -61,8 +65,8 @@ async function pushImage(definitionPath, definitionId, repo, release, updateLate
     const devContainerJson = jsonc.parse(devContainerJsonRaw);
 
     // Update common setup script download URL, SHA
-    console.log(`(*) Updating common script URI, SHA for ${definitionId}...`);
-    await update.updateDockerFileSetupScript(dockerFilePath, definitionId, repo, release);
+    console.log(`(*) Prep Dockerfile for ${definitionId}...`);
+    await update.prepDockerFile(dockerFilePath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, true);
 
     // Build image
     console.log(`(*) Building image...`);
@@ -93,6 +97,23 @@ async function pushImage(definitionPath, definitionId, repo, release, updateLate
     }
 
     console.log('(*) Done!\n');
+}
+
+function getDefinitionsToPush(definitions, sortedList) {
+    definitions = definitions || utils.getConfig('definitionBuildGraph', {});
+    sortedList = sortedList || [];
+    for(let definition in definitions) {
+        const childNode = definitions[definition]
+        // Ignore functions, other properties
+        if(typeof definition === 'string' && childNode !== false ) {
+            sortedList.push(definition);
+            // If has sub-definitions, add them next
+            if(typeof childNode === 'object') {
+                sortedList.concat(getDefinitionsToPush(childNode, sortedList));
+            }
+        }
+    }
+    return sortedList;
 }
 
 module.exports = {
