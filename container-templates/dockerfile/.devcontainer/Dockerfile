@@ -15,9 +15,9 @@ ARG USER_GID=$USER_UID
 # Set to false to skip installing zsh and Oh My ZSH!
 ARG INSTALL_ZSH="true"
 
-# Location and expected SHA for common setup script
-ARG COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/microsoft/vscode-dev-containers/master/script-library/common-debian.sh"
-ARG COMMON_SCRIPT_SHA="none"
+# Location and expected SHA for common setup script - SHA generated on release
+ARG COMMON_SCRIPT_SOURCE="https://aka.ms/vscode-dev-containers/common-debian.sh"
+ARG COMMON_SCRIPT_SHA="dev-mode"
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -28,8 +28,8 @@ RUN apt-get update \
     #
     # Verify git, common tools / libs installed, add/modify non-root user, optionally install zsh
     && curl -sSL -o /tmp/common-setup.sh $COMMON_SCRIPT_SOURCE \
-    && if [ "${COMMON_SCRIPT_SHA}" != "none" ]; then echo "${COMMON_SCRIPT_SHA} /tmp/common-setup.sh" | sha256sum -c - ; fi \
-    && bash /tmp/common-setup.sh $USERNAME $USER_UID $USER_GID $INSTALL_ZSH \
+    && if [ "$COMMON_SCRIPT_SHA" != "dev-mode" ]; then echo "$COMMON_SCRIPT_SHA /tmp/common-setup.sh" | sha256sum -c - ; fi \
+    && bash /tmp/common-setup.sh "$INSTALL_ZSH" "$USERNAME" "$USER_UID" "$USER_GID"  \
     #
     # *****************************************************
     # * Add steps for installing needed dependencies here *
