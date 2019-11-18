@@ -56,7 +56,7 @@ if [ "$USER_GID" = "" ]; then
     USER_GID=1000
 fi 
 
-if [ "$USERNAME" = ""]; then
+if [ "$USERNAME" = "" ]; then
     USERNAME=$(awk -v val=$USER_UID -F ":" '$3==val{print $1}' /etc/passwd)
 fi
 
