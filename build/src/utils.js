@@ -48,6 +48,9 @@ function getLinuxDistroForDefinition(definitionId) {
 }
 
 function getTagsForVersion(definitionId, version, registry, registryPath) {
+    if (typeof config.definitionBuildSettings[definitionId] === 'undefined') {
+        return null;
+    }
     return config.definitionBuildSettings[definitionId].tags.reduce((list, tag) => {
         // One of the tags that needs to be supported is one where there is no version, but there
         // are other attributes. For example, python:3 in addition to python:0.35.0-3. So, a version

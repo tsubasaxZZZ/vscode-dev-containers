@@ -18,15 +18,11 @@ const stubPromises = {
 const containersPathInRepo = utils.getConfig('containersPathInRepo');
 const scriptLibraryPathInRepo = utils.getConfig('scriptLibraryPathInRepo');
 
-// Use configured stub registry regardless of arguments since this is what is in files
 const expectedRegistryPath = `${utils.getConfig('stubRegistry', 'mcr.microsoft.com')}/${utils.getConfig('stubRegistryPath', 'vscode/devcontainers')}`;
 
 async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, isForBuild) {
     // Use exact version of building, MAJOR.MINOR if not
     const version = isForBuild ? utils.getVersionFromRelease(release) : utils.majorMinorFromRelease(release);
-   
-    // If for building, use registry not stub registry
-    const targetRegistryPath = `${isForBuild ? registry : stubRegistry}/${isForBuild ? registryPath : stubRegistryPath}`;
 
     // Read Dockerfile
     const devContainerDockerfileRaw = await utils.readFile(devContainerDockerfilePath);
@@ -48,11 +44,20 @@ async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, re
             .replace(/COMMON_SCRIPT_SOURCE=".+"/, `COMMON_SCRIPT_SOURCE="${scriptSource}"`);
     }
 
-    // Update FROM to target registry and version if vscode-dev-containers MCR path is detected
-    const parentTag = utils.getParentTagForVersion(definitionId, version, registry, registryPath);
-    if(parentTag) {
-        devContainerDockerfileModified = devContainerDockerfileModified.replace(/FROM .+:.+/,`FROM ${parentTag}`)        
+    if(isForBuild) {
+        // Update FROM to target registry and version if vscode-dev-containers MCR path is detected
+        const parentTag = utils.getParentTagForVersion(definitionId, version, registry, registryPath);
+        if(parentTag) {
+            devContainerDockerfileModified = devContainerDockerfileModified.replace(/FROM .+:.+/,`FROM ${parentTag}`)        
+        }
+    } else {
+        // Otherwise update any Dockerfiles that refer to mcr tags with the correct version 
+        const fromCaptureGroups = new RegExp(`(FROM ${expectedRegistryPath}/${scriptLibraryPathInRepo.replace('.','\\.')}/.+)(:.+)"`).exec(devContainerDockerfileRaw);
+        if(fromCaptureGroups) {
+            devContainerDockerfileModified = devContainerDockerfileModified.replace(fromCaptureGroups[0],`${fromCaptureGroups[1]}${fromCaptureGroups[2].replace(':dev', `:${version}`)}`)        
+        }
     }
+ 
     await utils.writeFile(devContainerDockerfilePath, devContainerDockerfileModified)
 }
 
