@@ -6,13 +6,7 @@
 const path = require('path');
 const utils = require('./utils');
 
-const commonScriptNames = utils.getConfig('commonScriptNames', {});
-const commonScriptPath = path.join(__dirname, '..', '..', utils.getConfig('scriptLibraryPathInRepo', 'script-library'));
-const commonScriptSHAPromises = {
-    alpine: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.alpine)),
-    debian: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.debian)),
-    readhat: utils.shaForFile(path.join(commonScriptPath, commonScriptNames.redhat))
-}
+const scriptSHA = {};
 
 const assetsPath = path.join(__dirname, '..', 'assets');
 const stubPromises = {
@@ -32,27 +26,40 @@ async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, re
     const version = isForBuild ? utils.getVersionFromRelease(release) : utils.majorMinorFromRelease(release);
    
     // If for building, use registry not stub registry
-    const targetRegistryPath = `${isForBuild ? registry : stubRegistry}/${isForBuild ? registryPath : stubRegistryPath}`
+    const targetRegistryPath = `${isForBuild ? registry : stubRegistry}/${isForBuild ? registryPath : stubRegistryPath}`;
 
-    // Get script SHA and name
-    const commonScriptName = utils.objectByDefinitionLinuxDistro(definitionId, commonScriptNames);
-    const commonScriptSHA = await utils.objectByDefinitionLinuxDistro(definitionId, commonScriptSHAPromises);
-    
+    // Read Dockerfile
     const devContainerDockerfileRaw = await utils.readFile(devContainerDockerfilePath);
-    let devContainerDockerfileModified = devContainerDockerfileRaw
-        .replace(/COMMON_SCRIPT_SHA=".+"/, `COMMON_SCRIPT_SHA="${commonScriptSHA}"`)
-        .replace(/COMMON_SCRIPT_SOURCE=".+"/, `COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/${repo}/${release}/${scriptLibraryPathInRepo}/${commonScriptName}"`);
-    const captureGroups = new RegExp(`FROM (${expectedRegistryPath.replace('.','\\.')})/(.+):(.+)`).exec(devContainerDockerfileRaw);
-    if (captureGroups) {
-        devContainerDockerfileModified = devContainerDockerfileModified.replace(captureGroups[0],`FROM ${targetRegistryPath}/${captureGroups[2]}:${version}`)
+    let devContainerDockerfileModified = devContainerDockerfileRaw;
+    
+    // Replace script URL and generate SHA if applicable
+    const scriptCaptureGroups = new RegExp(`COMMON_SCRIPT_SOURCE="(.+)/${scriptLibraryPathInRepo.replace('.','\\.')}/(.+)"`).exec(devContainerDockerfileRaw);
+    if (scriptCaptureGroups) {
+        const scriptName = scriptCaptureGroups[2];
+        const scriptSource = `https://raw.githubusercontent.com/${repo}/${release}/${scriptLibraryPathInRepo}/${scriptName}`;
+        let sha = scriptSHA[scriptName];
+        if(typeof sha === 'undefined') {
+            const scriptRaw = await utils.getUrlAsString(scriptSource);
+            sha = utils.shaForString(scriptRaw); 
+            scriptSHA[scriptName] = sha;
+        }
+        devContainerDockerfileModified = devContainerDockerfileModified
+            .replace(/COMMON_SCRIPT_SHA=".+"/, `COMMON_SCRIPT_SHA="${sha}"`)
+            .replace(/COMMON_SCRIPT_SOURCE=".+"/, `COMMON_SCRIPT_SOURCE="${scriptSource}"`);
+    }
+
+    // Update FROM to target registry and version if vscode-dev-containers MCR path is detected
+    const parentTag = utils.getParentTagForVersion(definitionId, version, registry, registryPath);
+    if(parentTag) {
+        devContainerDockerfileModified = devContainerDockerfileModified.replace(/FROM .+:.+/,`FROM ${parentTag}`)        
     }
     await utils.writeFile(devContainerDockerfilePath, devContainerDockerfileModified)
 }
 
-function getFromSnippet(definitionId, baseTag, repo, release, version, baseDockerFileExists) {
+function getFromSnippet(definitionId, imageTag, repo, release, baseDockerFileExists) {
     return `# ${utils.getConfig('dockerFilePreamble')}\n` +
         `# https://github.com/${repo}/tree/${release}/${containersPathInRepo}/${definitionId}/.devcontainer/${baseDockerFileExists ? 'base.' : ''}Dockerfile\n` +
-        `FROM ${baseTag}:${version}`;
+        `FROM ${imageTag}`;
 }
 
 module.exports = {
@@ -60,9 +67,9 @@ module.exports = {
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         console.log('(*) Generating user Dockerfile...');
         const templateDockerfile = await utils.objectByDefinitionLinuxDistro(definitionId, stubPromises);
-        const baseTag = utils.getBaseTag(definitionId, stubRegistry, stubRegistryPath);
         const majorMinor = utils.majorMinorFromRelease(release);
-        const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, baseTag, repo, release, majorMinor, baseDockerFileExists));
+        const imageTag = utils.getTagsForVersion(definitionId, majorMinor, stubRegistry, stubRegistryPath);
+        const userDockerFile = templateDockerfile.replace('FROM REPLACE-ME', getFromSnippet(definitionId, imageTag, repo, release, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFile);
     },
 
@@ -71,9 +78,9 @@ module.exports = {
         const userDockerFilePath = path.join(dotDevContainerPath, 'Dockerfile');
         const userDockerFile = await utils.readFile(userDockerFilePath);
 
-        const baseTag = utils.getBaseTag(definitionId, registry, registryPath);
         const majorMinor = utils.majorMinorFromRelease(release);
-        const userDockerFileModified = userDockerFile.replace(new RegExp(`FROM .+:.+`), getFromSnippet(definitionId, baseTag, repo, release, majorMinor, baseDockerFileExists));
+        const imageTag = utils.getTagsForVersion(definitionId, majorMinor, registry, registryPath);
+        const userDockerFileModified = userDockerFile.replace(/FROM .+:.+/, getFromSnippet(definitionId, imageTag, repo, release, baseDockerFileExists));
         await utils.writeFile(userDockerFilePath, userDockerFileModified);
     },
 
