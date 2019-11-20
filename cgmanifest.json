@@ -1,0 +1,245 @@
+{
+    "Registrations": [
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Docker Image: debian",
+                    "Version": "9",
+                    "DownloadUrl": "https://hub.docker.com/_/debian"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: apt-transport-https",
+                    "Version": "1.4.9 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/apt-transport-https"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: apt-utils",
+                    "Version": "1.4.9 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/apt-utils"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: ca-certificates",
+                    "Version": "20161130+nmu1+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/ca-certificates"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: curl",
+                    "Version": "7.52.1-5+deb9u9 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/curl"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: dialog",
+                    "Version": "1.3-20160828-2 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/dialog"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: git",
+                    "Version": "1:2.11.0-3+deb9u4 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/git"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: iproute2",
+                    "Version": "4.9.0-1+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/iproute2"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libc6",
+                    "Version": "2.24-11+deb9u4 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libc6"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libgcc1",
+                    "Version": "1:6.3.0-18+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libgcc1"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libgssapi-krb5-2",
+                    "Version": "1.15-1+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libgssapi-krb5-2"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libicu57",
+                    "Version": "57.1-6+deb9u3 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libicu57"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: liblttng-ust0",
+                    "Version": "2.9.0-2+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/liblttng-ust0"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libssl1.0.2",
+                    "Version": "1.0.2t-1~deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libssl1.0.2"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libssl1.1",
+                    "Version": "1.1.0l-1~deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libssl1.1"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: libstdc++6",
+                    "Version": "6.3.0-18+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/libstdc++6"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: lsb-release",
+                    "Version": "9.20161125 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/lsb-release"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: procps",
+                    "Version": "2:3.3.12-3+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/procps"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: sudo",
+                    "Version": "1.8.19p1-2.1+deb9u1 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/sudo"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: unzip",
+                    "Version": "6.0-21+deb9u2 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/unzip"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: wget",
+                    "Version": "1.18-5+deb9u3 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/wget"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: zlib1g",
+                    "Version": "1:1.2.8.dfsg-5 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/zlib1g"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Debian Package: zsh",
+                    "Version": "5.3.1-4+b3 (stretch)",
+                    "DownloadUrl": "https://packages.debian.org/stretch/zsh"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "Other": {
+                    "Name": "Oh My Zsh!",
+                    "repositoryUrl": "https://github.com/robbyrussell/oh-my-zsh",
+                    "commitHash": "c130aadb6a66aa680a322c08d87ad773316f713d"
+                }
+            }
+        }
+    ],
+    "Version": 1
+}

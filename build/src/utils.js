@@ -68,14 +68,18 @@ module.exports = {
     spawn: async (command, args, opts) => {
         opts = opts || { stdio: 'inherit', shell: true };
         return new Promise((resolve, reject) => {
+            let result = '';
             const proc = spawnCb(command, args, opts);
             proc.on('close', (code, signal) => {
                 if (code !== 0) {
                     reject(`Non-zero exit code: ${code} ${signal || ''}`);
                     return;
                 }
-                resolve();
+                resolve(result);
             });
+            if(proc.stdout) {
+                proc.stdout.on('data', (chunk) => result += chunk.toString());
+            }
             proc.on('error', (err) => {
                 reject(err);
             });

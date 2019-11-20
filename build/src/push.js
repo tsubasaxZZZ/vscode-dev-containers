@@ -101,32 +101,6 @@ async function pushImage(definitionPath, definitionId, repo, release, updateLate
     console.log('(*) Done!\n');
 }
 
-/*
-function getDefinitionsToPush(definitions, sortedList) {
-    definitions = definitions || utils.clone(utils.getConfig('definitionBuildSettings', {}));
-    sortedList = sortedList || [];
-
-    for(let definition in definitions) {
-        const definitionSettings = definitions[definition]; 
-        if (typeof definitionSettings === 'object') {
-            sortedList.push(definition);
-            const children = definitionSettings.children;
-            // Ignore functions, other properties
-            if(children) {
-                // Add children to the list
-                sortedList.concat(getDefinitionsToPush(children, sortedList));
-                // Children are already processed, so don't add them again
-                children.forEach((child) => {
-                    definitions[child] = undefined;
-                });
-            }    
-        }
-    }
-    return sortedList;
-}
-*/
-
-
 module.exports = {
     push: push
 }
