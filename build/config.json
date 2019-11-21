@@ -7,49 +7,49 @@
 	"definitionBuildSettings": {
 		"debian-9-git": {
 			"latest": true,
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"tags": [
 				"base:${VERSION}-debian-9",
 				"base:${VERSION}-stretch"
 			]
 		},
 		"ubuntu-18.04-git": {
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"tags": [
 				"base:${VERSION}-ubuntu-18.04",
 				"base:${VERSION}-bionic"
 			]
 		},
 		"alpine-3.10-git": {
-			"distroRoot": "alpine",
+			"rootDistro": "alpine",
 			"tags": [
 				 "base:${VERSION}-alpine-3.10"
 			]
 		},
 		"javascript-node-12": {
 			"latest": true,
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"tags": [
 				"javascript-node:${VERSION}-12"
 			]
 		},
 		"javascript-node-10": {
 			"latest": true,
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"tags": [
 				"javascript-node:${VERSION}-10"
 			]
 		},
 		"typescript-node-12": {
 			"latest": true,
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"parent": "javascript-node-12",
 			"tags": [
 				"typescript-node:${VERSION}-12"
 			]
 		},
 		"typescript-node-10": {
-			"distroRoot": "debian",
+			"rootDistro": "debian",
 			"parent": "javascript-node-10",
 			"tags": [
 				"typescript-node:${VERSION}-10"
