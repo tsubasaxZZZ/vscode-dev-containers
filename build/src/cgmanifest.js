@@ -46,47 +46,52 @@ module.exports = {
 
                 // Run commands in the package to pull out needed versions - Debian
                 if(dependencies.debian) {
-                    // dpkg-query --show -f='${Package}\t${Version}\n' <package>
+                    // Command to get package versions: dpkg-query --show -f='${Package}\t${Version}\n' <package>
                     // Output: <package>    <version>
+                    // Command to get download URLs: apt-get update && apt-get install -y --reinstall --print-uris
                     cgManifest.Registrations = cgManifest.Registrations.concat(await generatePackageComponentList(
-                        dependencies.debian.packages,
+                        'Debian Package:',
+                        dependencies.debian,
                         imageTag,
                         alreadyRegistered,
                         "dpkg-query --show -f='${Package}\t${Version}\n'",
                         /(.+)\t(.+)/,
-                        'Debian Package:',
-                        `(${dependencies.debian.version})`,
-                        `https://packages.debian.org/${dependencies.debian.version}`));
+                        'apt-get update && apt-get install -y --reinstall --print-uris',
+                        "'(.+)'\\s*${PACKAGE}_${VERSION}"));
                 }
 
                 // Run commands in the package to pull out needed versions - Ubuntu
                 if(dependencies.ubuntu) {
-                    // dpkg-query --show -f='${Package}\t${Version}\n' <package>
+                    // Command to get package versions: dpkg-query --show -f='${Package}\t${Version}\n' <package>
                     // Output: <package>    <version>
+                    // Command to get download URLs: apt-get update && apt-get install -y --reinstall --print-uris
                     cgManifest.Registrations = cgManifest.Registrations.concat(await generatePackageComponentList(
-                        dependencies.ubuntu.packages,
+                        'Ubuntu Package:',
+                        dependencies.ubuntu,
                         imageTag,
                         alreadyRegistered,
                         "dpkg-query --show -f='${Package}\t${Version}\n'",
                         /(.+)\t(.+)/,
-                        'Ubuntu Package:',
-                        `(${dependencies.ubuntu.version})`,
-                        `https://packages.ubuntu.com/${dependencies.ubuntu.version}`));
+                        'apt-get update && apt-get install -y --reinstall --print-uris',
+                        "'(.+)'\\s*${PACKAGE}_${VERSION}"));
                 }
 
                 // Run commands in the package to pull out needed versions - Alpine
                 if(dependencies.alpine) {
-                    // apk info -e -v <package>
-                    // Output: <package>-<version-with-dashes>
+                    // Command to get package versions: apk info -e -v <package>
+                    // Output: <package-with-maybe-dashes>-<version-with-dashes>
+                    // Command to get download URLs: apk policy
                     cgManifest.Registrations = cgManifest.Registrations.concat(await generatePackageComponentList(
-                        dependencies.alpine.packages,
+                        'Alpine Package:',
+                        dependencies.alpine,
                         imageTag,
                         alreadyRegistered,
                         "apk info -e -v",
-                        /([^-]+)-(.+)/,
-                        `(${dependencies.alpine.version})`,
-                        'Alpine Package:',
-                        `https://pkgs.alpinelinux.org/package/v${dependencies.alpine.version}/main/x86_64`));
+                        /(.+)-([0-9].+)/,
+                        'apk update && apk policy',
+                        '${PACKAGE} policy:\\n.*${VERSION}:\\n.*lib/apk/db/installed\\n\\s*(.+)\\n',
+                        '/x86_64/${PACKAGE}-${VERSION}.apk'));
+
                 }
             }
 
@@ -105,28 +110,59 @@ module.exports = {
     }
 }
 
-async function generatePackageComponentList(packageList, imageTag, alreadyRegistered, listCommand, parseRegEx, namePrefix, versionSuffix, packageUrlString) {
+async function generatePackageComponentList( namePrefix, packageList, imageTag, alreadyRegistered, listCommand, lineRegEx, getUriCommand, uriMatchRegex, uriSuffix) {
     const componentList = [];
+
+    // Generate and exec command to get installed package version
+    console.log('(*) Getting package versions...');
     const packageVersionListCommand = packageList.reduce((prev, current) => {
         return prev += ` ${current}`;
     }, listCommand);
-    const packageVersionListRaw = await utils.spawn('docker', ['run', '--rm', imageTag, packageVersionListCommand], { shell:true, stdio: 'pipe' });
-    const packageVersionList = packageVersionListRaw.split('\n');
+    const packageVersionListOutput = await utils.spawn('docker', 
+        ['run', '--rm', imageTag, packageVersionListCommand], 
+        { shell:true, stdio: 'pipe' });
+    
+    // Generate and exec command to extract download URI
+    console.log('(*) Getting package download URLs...');
+    const packageUriCommand = packageList.reduce((prev, current) => {
+        return prev += ` ${current}`;
+    }, getUriCommand);
+    const packageUriCommandOutput = await utils.spawn('docker', 
+        ['run', '--rm', imageTag, `sh -c '${packageUriCommand}'`], 
+        { shell:true, stdio: 'pipe' });
+
+    const packageVersionList = packageVersionListOutput.split('\n');
     packageVersionList.forEach((packageVersion) => {
         packageVersion = packageVersion.trim();
         if(packageVersion !== '') {
-            const versionCaptureGroup = parseRegEx.exec(packageVersion);
+            const versionCaptureGroup = new RegExp(lineRegEx).exec(packageVersion);
             const package = versionCaptureGroup[1];
             const version = versionCaptureGroup[2];
             const uniquePackageName = `${namePrefix} ${package}`;
             if(typeof alreadyRegistered[uniquePackageName] === 'undefined' || alreadyRegistered[uniquePackageName].indexOf(version) < 0) {
+                
+                const sanitizedPackage = package.replace(/\+/g, '\\+').replace(/\./g, '\\.');
+                // Handle regex reserved charters in version strings and that some versions start with something 
+                // like "1:" or "2:" that isn't in the download URL on Debian
+                const sanitizedVersion = version.replace(/\+/g, '\\+').replace(/\./g, '\\.').replace(/:/g, '%3a');
+                const uriCaptureGroup = new RegExp(
+                    uriMatchRegex.replace('${PACKAGE}', sanitizedPackage).replace('${VERSION}', sanitizedVersion), 'm').exec(packageUriCommandOutput);
+
+                if(!uriCaptureGroup) {
+                    console.log(`(!) No URI found for ${package} ${version}`)
+                } 
+    
+                const uriString = uriCaptureGroup ? uriCaptureGroup[1] : '';
+
                 componentList.push({
                     "Component": {
                         "Type": "other",
                         "Other": {
                             "Name": uniquePackageName,
-                            "Version": `${version} ${versionSuffix}`,
-                            "DownloadUrl": `${packageUrlString}/${package}`
+                            "Version": version,
+                            "DownloadUrl": `${uriString}${uriSuffix ? 
+                                uriSuffix.replace('${PACKAGE}', package).replace('${VERSION}', version) 
+                                : ''}`
                         }
                     }
                 });

@@ -69,9 +69,12 @@ module.exports = {
         opts = opts || { stdio: 'inherit', shell: true };
         return new Promise((resolve, reject) => {
             let result = '';
+            let errorOutput = '';
             const proc = spawnCb(command, args, opts);
             proc.on('close', (code, signal) => {
                 if (code !== 0) {
+                    console.log(result);
+                    console.error(errorOutput);
                     reject(`Non-zero exit code: ${code} ${signal || ''}`);
                     return;
                 }
@@ -79,6 +82,9 @@ module.exports = {
             });
             if(proc.stdout) {
                 proc.stdout.on('data', (chunk) => result += chunk.toString());
+            }
+            if(proc.stderr) {
+                proc.stderr.on('data', (chunk) => result += chunk.toString());
             }
             proc.on('error', (err) => {
                 reject(err);

@@ -9,21 +9,21 @@
 			"latest": true,
 			"distroRoot": "debian",
 			"tags": [
-				"git:${VERSION}-debian-9",
-				"git:${VERSION}-stretch"
+				"base:${VERSION}-debian-9",
+				"base:${VERSION}-stretch"
 			]
 		},
 		"ubuntu-18.04-git": {
 			"distroRoot": "debian",
 			"tags": [
-				"git:${VERSION}-ubuntu-18.04",
-				"git:${VERSION}-bionic"
+				"base:${VERSION}-ubuntu-18.04",
+				"base:${VERSION}-bionic"
 			]
 		},
 		"alpine-3.10-git": {
 			"distroRoot": "alpine",
 			"tags": [
-				 "git:${VERSION}-alpine-3.10"
+				 "base:${VERSION}-alpine-3.10"
 			]
 		},
 		"javascript-node-12": {
