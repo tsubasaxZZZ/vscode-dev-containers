@@ -30,7 +30,7 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
 #    && sudo apt-get autoremove -y \
 #    && sudo apt-get clean -y \
 #    && sudo rm -rf /var/lib/apt/lists/*
-# ENV DEBIAN_FRONTEND=
+# ENV DEBIAN_FRONTEND=dialog
 
 # Uncomment to default to non-root user
 # USER $USER_UID
