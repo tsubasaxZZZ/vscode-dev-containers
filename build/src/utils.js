@@ -30,12 +30,12 @@ function getConfig(property, defaultVal) {
 
 function getVersionFromRelease(release) {
     // Already is a version
-    if(!isNaN(parseInt(release.charAt(0)))) {
+    if (!isNaN(parseInt(release.charAt(0)))) {
         return release;
     }
 
     // Is a release string
-    if(release.charAt(0) === 'v' && !isNaN(parseInt(release.charAt(1)))) {
+    if (release.charAt(0) === 'v' && !isNaN(parseInt(release.charAt(1)))) {
         return release.substr(1);
     }
 
@@ -56,8 +56,8 @@ function getTagsForVersion(definitionId, version, registry, registryPath) {
         // are other attributes. For example, python:3 in addition to python:0.35.0-3. So, a version
         // of '' is allowed. However, there are also instances that are just the version, so in 
         // these cases latest would be used instead. However, latest is passed in separately.
-        const baseTag = tag.replace('${VERSION}',version).replace(':-', ':');
-        if(baseTag.charAt(baseTag.length-1) !== ':') {
+        const baseTag = tag.replace('${VERSION}', version).replace(':-', ':');
+        if (baseTag.charAt(baseTag.length - 1) !== ':') {
             list.push(`${registry}/${registryPath}/${baseTag}`);
         }
         return list;
@@ -80,10 +80,10 @@ module.exports = {
                 }
                 resolve(result);
             });
-            if(proc.stdout) {
+            if (proc.stdout) {
                 proc.stdout.on('data', (chunk) => result += chunk.toString());
             }
-            if(proc.stderr) {
+            if (proc.stderr) {
                 proc.stderr.on('data', (chunk) => result += chunk.toString());
             }
             proc.on('error', (err) => {
@@ -144,15 +144,15 @@ module.exports = {
         return fs.existsSync(filePath);
     },
 
-    getTagList: (definitionId, release, updateLatest, registry, registryPath) => {        
+    getTagList: (definitionId, release, updateLatest, registry, registryPath) => {
         const version = getVersionFromRelease(release);
-        if(version === 'dev') {
+        if (version === 'dev') {
             return getTagsForVersion(definitionId, 'dev', registry, registryPath);
         }
 
         const versionParts = version.split('.');
         if (versionParts.length !== 3) {
-            throw(`Invalid version format in ${version}.`);    
+            throw (`Invalid version format in ${version}.`);
         }
 
         const versionList = updateLatest ? [
@@ -161,11 +161,11 @@ module.exports = {
             `${versionParts[0]}`,
             '' // This is the equivalent of latest - e.g. python:3 instead of python:0.35.0-3
         ] : [
-            version,
-            `${versionParts[0]}.${versionParts[1]}`
-        ];
+                version,
+                `${versionParts[0]}.${versionParts[1]}`
+            ];
 
-        const tagList  = (updateLatest && config.definitionBuildSettings[definitionId].latest) ? ['latest'] : [];
+        const tagList = (updateLatest && config.definitionBuildSettings[definitionId].latest) ? ['latest'] : [];
         versionList.forEach((tagVersion) => {
             tagList.concat(getTagsForVersion(definitionId, tagVersion, registry, registryPath));
         });
@@ -175,11 +175,11 @@ module.exports = {
 
     getSortedDefinitionBuildList: () => {
         const sortedList = [];
-        const settingsCopy = JSON.parse(JSON.stringify(config.definitionBuildSettings)); 
+        const settingsCopy = JSON.parse(JSON.stringify(config.definitionBuildSettings));
 
-        for(let definitionId in config.definitionBuildSettings) {
+        for (let definitionId in config.definitionBuildSettings) {
             const add = (defId) => {
-                if(typeof settingsCopy[defId] === 'object') {
+                if (typeof settingsCopy[defId] === 'object') {
                     add(settingsCopy[defId].parent);
                     sortedList.push(defId);
                     settingsCopy[defId] = undefined;
@@ -198,8 +198,8 @@ module.exports = {
 
     majorMinorFromRelease: (release) => {
         const version = getVersionFromRelease(release);
-        
-        if(version === 'dev') {
+
+        if (version === 'dev') {
             return 'dev';
         }
 
@@ -211,10 +211,10 @@ module.exports = {
         return new Promise((resolve, reject) => {
             const fd = fs.createReadStream(filePath);
             const hash = crypto.createHash('sha256');
-            hash.setEncoding('hex');    
-            fd.on('end', function() {
+            hash.setEncoding('hex');
+            fd.on('end', function () {
                 hash.end();
-                resolve(hash.read()); 
+                resolve(hash.read());
             });
             fd.on('error', (err) => {
                 reject(err);
@@ -238,8 +238,8 @@ module.exports = {
     getUrlAsString: async (url) => {
         return new Promise((resolve, reject) => {
             let content = '';
-            const req = https.get(url, function(res) {
-                res.on('data', function(chunk) {
+            const req = https.get(url, function (res) {
+                res.on('data', function (chunk) {
                     content += chunk.toString();
                 });
             });
