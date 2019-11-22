@@ -12,20 +12,21 @@ FROM REPLACE-ME
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# [Optional] Update UID/GID if needed and install additional software
+# [Optional] Update UID/GID if needed
 RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
-        sudo groupmod 1000 --gid $USER_GID \
-        && sudo usermod --uid $USER_UID --gid $USER_GID 1000; \
+        USERNAME=$(awk -v val=1000 -F ":" '$3==val{print $1}' /etc/passwd) \
+        && groupmod --gid $USER_GID $USERNAME \
+        && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
-# ****************************************************************
-# * Add steps for installing any other needed dependencies here. *
-# * Omit sudo if it isn't installed and you are running as root. *
-# ****************************************************************
-# RUN sudo yum -y install <your-package-name-here> \
+# **********************************************************
+# * Uncomment this section and to add steps for installing *
+# * any other needed dependencies.                         *
+# **********************************************************
+# RUN yum -y install <your-package-name-here> \
 #     # 
 #     # Clean up
-#     && sudo yum clean all
+#     && yum clean all
 
 # Uncomment to default to non-root user
 # USER $USER_UID
