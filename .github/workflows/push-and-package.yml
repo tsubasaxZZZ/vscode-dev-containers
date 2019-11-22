@@ -1,10 +1,10 @@
 name: Release Containers
 
-# on:
-#  repository_dispatch:
-#  push:
-#    tags:
-#    - 'v*'
+on:
+  repository_dispatch:
+  push:
+    tags:
+    - 'v*'
 
 jobs:
   build:
