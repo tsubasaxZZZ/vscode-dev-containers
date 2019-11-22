@@ -3,17 +3,9 @@
  *  Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
  *-------------------------------------------------------------------------------------------------------------*/
 
-const fs = require('fs');
-const https = require('https');
-const crypto = require('crypto');
-const rimrafCb = require('rimraf');
-const mkdirpCb = require('mkdirp');
-const copyFilesCb = require('copyfiles');
-const spawnCb = require('child_process').spawn;
-const config = require('../config.json');
+const config = require('../../config.json');
 
-/** Async file, spawn, and cp functions **/
-
+// Get a value from the config file or a similarly named env var
 function getConfig(property, defaultVal) {
     defaultVal = defaultVal || null;
     // Generate env var name from property - camelCase to CAMEL_CASE
@@ -28,6 +20,8 @@ function getConfig(property, defaultVal) {
     return process.env[envVar] || config[property] || defaultVal;
 }
 
+
+// Convert a release string (v1.0.0) or branch (master) into a version
 function getVersionFromRelease(release) {
     // Already is a version
     if (!isNaN(parseInt(release.charAt(0)))) {
@@ -43,25 +37,24 @@ function getVersionFromRelease(release) {
     return 'dev';
 }
 
+// Look up distro and fallback to debian if not specified
 function getLinuxDistroForDefinition(definitionId) {
     return config.definitionBuildSettings[definitionId].rootDistro || 'debian';
 }
 
+// Generate 'latest' flavor of a given definition's tag
 function getLatestTag(definitionId, registry, registryPath) {
     if (typeof config.definitionBuildSettings[definitionId] === 'undefined') {
         return null;
     }
     return config.definitionBuildSettings[definitionId].tags.reduce((list, tag) => {
-        // One of the tags that needs to be supported is one where there is no version, but there
-        // are other attributes. For example, python:3 in addition to python:0.35.0-3. So, a version
-        // of '' is allowed. However, there are also instances that are just the version, so in 
-        // these cases latest would be used instead. However, latest is passed in separately.
         list.push(`${registry}/${registryPath}/${tag.replace(/:.+/, ':latest')}`);
         return list;
     }, []);
 
 }
 
+// Create all the needed variants of the specified version identifier for a given definition
 function getTagsForVersion(definitionId, version, registry, registryPath) {
     if (typeof config.definitionBuildSettings[definitionId] === 'undefined') {
         return null;
@@ -80,87 +73,8 @@ function getTagsForVersion(definitionId, version, registry, registryPath) {
 }
 
 module.exports = {
-    spawn: async (command, args, opts) => {
-        console.log(`(*) Spawn: ${command}${args.reduce((prev, current)=> `${prev} ${current}`,'')}`);
 
-        opts = opts || { stdio: 'inherit', shell: true };
-        return new Promise((resolve, reject) => {
-            let result = '';
-            let errorOutput = '';
-            const proc = spawnCb(command, args, opts);
-            proc.on('close', (code, signal) => {
-                if (code !== 0) {
-                    console.log(result);
-                    console.error(errorOutput);
-                    reject(`Non-zero exit code: ${code} ${signal || ''}`);
-                    return;
-                }
-                resolve(result);
-            });
-            if (proc.stdout) {
-                proc.stdout.on('data', (chunk) => result += chunk.toString());
-            }
-            if (proc.stderr) {
-                proc.stderr.on('data', (chunk) => result += chunk.toString());
-            }
-            proc.on('error', (err) => {
-                reject(err);
-            });
-        });
-    },
-
-    rename: async (from, to) => {
-        return new Promise((resolve, reject) => {
-            fs.rename(from, to, (err) => err ? reject(err) : resolve());
-        });
-    },
-
-    readFile: async (filePath) => {
-        return new Promise((resolve, reject) => {
-            fs.readFile(filePath, 'utf8', (err, data) => err ? reject(err) : resolve(data.toString()));
-        });
-    },
-
-    writeFile: async function (filePath, data) {
-        return new Promise((resolve, reject) => {
-            fs.writeFile(filePath, data, 'utf8', (err) => err ? reject(err) : resolve(filePath));
-        });
-    },
-
-    mkdirp: async (pathToMake) => {
-        return new Promise((resolve, reject) => {
-            mkdirpCb(pathToMake, (err, made) => err ? reject(err) : resolve(made));
-        });
-    },
-
-    rimraf: async (pathToRemove, opts) => {
-        opts = opts || {};
-        return new Promise((resolve, reject) => {
-            rimrafCb(pathToRemove, opts, (err) => err ? reject(err) : resolve(pathToRemove));
-        });
-    },
-
-    copyFiles: async (source, blobs, target) => {
-        return new Promise((resolve, reject) => {
-            process.chdir(source);
-            copyFilesCb(
-                blobs.concat(target),
-                { all: true },
-                (err) => err ? reject(err) : resolve(target));
-        });
-    },
-
-    readdir: async (dirPath, opts) => {
-        opts = opts || {};
-        return new Promise((resolve, reject) => {
-            fs.readdir(dirPath, opts, (err, files) => err ? reject(err) : resolve(files));
-        });
-    },
-
-    exists: function (filePath) {
-        return fs.existsSync(filePath);
-    },
-
+    // Generate complete list of tags for a given definition
     getTagList: (definitionId, release, updateLatest, registry, registryPath) => {
         const version = getVersionFromRelease(release);
         if (version === 'dev') {
@@ -191,6 +105,7 @@ module.exports = {
         return tagList;
     },
 
+    // Walk the image build config and sort list so parents build before children
     getSortedDefinitionBuildList: () => {
         const sortedList = [];
         const settingsCopy = JSON.parse(JSON.stringify(config.definitionBuildSettings));
@@ -209,11 +124,13 @@ module.exports = {
         return sortedList;
     },
 
+    // Get parent tag for a given child definition
     getParentTagForVersion: (definitionId, version, registry, registryPath) => {
         const parentId = config.definitionBuildSettings[definitionId].parent;
         return parentId ? getTagsForVersion(parentId, version, registry, registryPath)[0] : null;
     },
 
+    // Return just the manor and minor version of a release number
     majorMinorFromRelease: (release) => {
         const version = getVersionFromRelease(release);
 
@@ -225,45 +142,11 @@ module.exports = {
         return `${versionParts[0]}.${versionParts[1]}`;
     },
 
-    shaForFile: async (filePath) => {
-        return new Promise((resolve, reject) => {
-            const fd = fs.createReadStream(filePath);
-            const hash = crypto.createHash('sha256');
-            hash.setEncoding('hex');
-            fd.on('end', function () {
-                hash.end();
-                resolve(hash.read());
-            });
-            fd.on('error', (err) => {
-                reject(err);
-            });
-            fd.pipe(hash);
-        })
-    },
-
-    shaForString: (content) => {
-        const hash = crypto.createHash('sha256');
-        hash.update(content);
-        return hash.digest('hex');
-    },
-
+    // Return an object from a map based on the linux distro for the definition
     objectByDefinitionLinuxDistro: (definitionId, objectsByDistro) => {
         const distro = getLinuxDistroForDefinition(definitionId);
         const obj = objectsByDistro[distro];
         return obj;
-    },
-
-    getUrlAsString: async (url) => {
-        return new Promise((resolve, reject) => {
-            let content = '';
-            const req = https.get(url, function (res) {
-                res.on('data', function (chunk) {
-                    content += chunk.toString();
-                });
-            });
-            req.on("error", reject);
-            req.on('close', () => resolve(content));
-        });
     },
 
     getLinuxDistroForDefinition: getLinuxDistroForDefinition,

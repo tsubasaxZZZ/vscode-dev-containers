@@ -4,11 +4,11 @@
  *  Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
  *-------------------------------------------------------------------------------------------------------------*/
 
-const utils = require('./src/utils');
 const push = require('./src/push').push;
 const package = require('./src/package').package;
 const createStub = require('./src/prep').createStub;
 const generateComponentGovernanceManifest = require('./src/cgmanifest').generateComponentGovernanceManifest;
+const configUtils = require('./src/utils/config');
 const packageJson = require('../package.json');
 
 console.log('vscode-dev-containers CLI\nCopyright (c) Microsoft Corporation. All rights reserved.\n')
@@ -23,19 +23,19 @@ require('yargs')
                 },
                 'registry': {
                     describe: 'container registry to push images to',
-                    default: utils.getConfig('containerRegistry', 'docker.io')
+                    default: configUtils.getConfig('containerRegistry', 'docker.io')
                 },
                 'registry-path': {
                     describe: 'container registry path',
-                    default: utils.getConfig('containerRegistryPath', 'vscode/devcontainers')
+                    default: configUtils.getConfig('containerRegistryPath', 'vscode/devcontainers')
                 },
                 'stub-registry': {
                     describe: 'registry to add to stub',
-                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
+                    default: configUtils.getConfig('stubRegistry', configUtils.getConfig('containerRegistry', 'docker.io'))
                 },
                 'stub-registry-path': {
                     describe: 'stub registry path',
-                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
+                    default: configUtils.getConfig('stubRegistryPath', configUtils.getConfig('containerRegistryPath', ''))
                 },
                 'simulate': {
                     describe: 'whether to simulate a push instead of doing it',
@@ -44,7 +44,7 @@ require('yargs')
                 },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
-                    default: utils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
+                    default: configUtils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -66,23 +66,23 @@ require('yargs')
                 },
                 'registry': {
                     describe: 'container registry to push images to',
-                    default: utils.getConfig('containerRegistry', 'docker.io')
+                    default: configUtils.getConfig('containerRegistry', 'docker.io')
                 },
                 'registry-path': {
                     describe: 'container registry path',
-                    default: utils.getConfig('containerRegistryPath', '')
+                    default: configUtils.getConfig('containerRegistryPath', '')
                 },
                 'stub-registry': {
                     describe: 'registry to add to stub',
-                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
+                    default: configUtils.getConfig('stubRegistry', configUtils.getConfig('containerRegistry', 'docker.io'))
                 },
                 'stub-registry-path': {
                     describe: 'stub registry path',
-                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
+                    default: configUtils.getConfig('stubRegistryPath', configUtils.getConfig('containerRegistryPath', ''))
                 },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
-                    default: utils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
+                    default: configUtils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
@@ -112,15 +112,15 @@ require('yargs')
                 },
                 'stub-registry': {
                     describe: 'registry to add to stub',
-                    default: utils.getConfig('stubRegistry', utils.getConfig('containerRegistry', 'docker.io'))
+                    default: configUtils.getConfig('stubRegistry', configUtils.getConfig('containerRegistry', 'docker.io'))
                 },
                 'stub-registry-path': {
                     describe: 'stub registry path',
-                    default: utils.getConfig('stubRegistryPath', utils.getConfig('containerRegistryPath', ''))
+                    default: configUtils.getConfig('stubRegistryPath', configUtils.getConfig('containerRegistryPath', ''))
                 },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
-                    default: utils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
+                    default: configUtils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
                 },
                 'has-base-dockerfile': {
                     describe: 'whether base.Dockerfile exists',
@@ -138,15 +138,15 @@ require('yargs')
                 },
                 'registry': {
                     describe: 'container registry to push images to',
-                    default: utils.getConfig('containerRegistry', 'docker.io')
+                    default: configUtils.getConfig('containerRegistry', 'docker.io')
                 },
                 'registry-path': {
                     describe: 'container registry path',
-                    default: utils.getConfig('containerRegistryPath', '')
+                    default: configUtils.getConfig('containerRegistryPath', '')
                 },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
-                    default: utils.getConfig('vscodeDevContainersRepo', 'https://github.com/microsoft/vscode-dev-containers')
+                    default: configUtils.getConfig('vscodeDevContainersRepo', 'https://github.com/microsoft/vscode-dev-containers')
                 }
             })
     }, cgCommand)
