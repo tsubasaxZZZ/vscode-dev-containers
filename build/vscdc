@@ -147,6 +147,10 @@ require('yargs')
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
                     default: configUtils.getConfig('vscodeDevContainersRepo', 'https://github.com/microsoft/vscode-dev-containers')
+                },
+                'no-build': {
+                    describe: 'skip the image build step',
+                    default: false
                 }
             })
     }, cgCommand)
@@ -180,7 +184,7 @@ function stubCommand(argv) {
 }
 
 function cgCommand(argv) {
-    generateComponentGovernanceManifest(argv.githubRepo, argv.release, argv.registry, argv.registryPath)
+    generateComponentGovernanceManifest(argv.githubRepo, argv.release, argv.registry, argv.registryPath, argv.noBuild)
         .catch((reason) => {
             console.error(`(!) Component governence manifest generation failed - ${reason}`);
             process.exit(1);
