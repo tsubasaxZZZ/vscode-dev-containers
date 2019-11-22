@@ -8,14 +8,14 @@ const definitionDependencies = require('../definition-dependencies.json');
 // Docker images and native OS libraries need to be registered as "other" while others are scenario dependant
 
 module.exports = {
-    generateComponentGovernanceManifest: async (repo, release, registry, registryPath, noBuild) => {
+    generateComponentGovernanceManifest: async (repo, release, registry, registryPath, buildFirst) => {
 
-        if(noBuild) {
-            console.log('(*) Using existing local images...');            
-        } else {
+        if(buildFirst) {
             // Simulate the build and push process, but don't actually push 
             console.log('(*) Simulating push process to trigger image builds...');
             await push(repo, release, false, registry, registryPath, registry, registryPath, true);
+        } else {
+            console.log('(*) Using existing local images...');            
         }
 
         const alreadyRegistered = {};
