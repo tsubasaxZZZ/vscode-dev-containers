@@ -19,10 +19,10 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
         && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
-# **********************************************************
-# * Uncomment this section and to add steps for installing *
-# * any other needed dependencies after "apt-get update".  *
-# **********************************************************
+# *********************************************************************
+# * Uncomment this section to use RUN to install other dependencies.  *
+# * See https://aka.ms/vscode-remote/containers/dockerfile-run        *
+# *********************************************************************
 # ENV DEBIAN_FRONTEND=noninteractive
 # RUN apt-get update \
 #    && apt-get -y install --no-reccomends <your-package-list-here> \

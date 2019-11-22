@@ -20,10 +20,11 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
         && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
-# **********************************************************
-# * Uncomment this section and to add steps for installing *
-# * any other needed dependencies after "apk update".      *
-# **********************************************************
+# ************************************************************************
+# * Uncomment this section to use RUN to install other dependencies.     *
+# * Note that Alpine uses "apk" instead of "apt-get" like Debian/Ubuntu. *
+# * See https://aka.ms/vscode-remote/containers/dockerfile-run           *
+# ************************************************************************
 # RUN apk update \
 #     && apk add --no-cache <your-package-list-here>
 

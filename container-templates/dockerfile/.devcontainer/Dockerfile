@@ -32,10 +32,11 @@ RUN apt-get update \
     && /bin/ash /tmp/common-setup.sh "$INSTALL_ZSH" "$USERNAME" "$USER_UID" "$USER_GID" \
     && rm /tmp/common-setup.sh \
     #
-    # *****************************************************
-    # * Add steps for installing needed dependencies here *
-    # *****************************************************
-    # && apt-get -y install --no-reccomends <your-package-name-here>
+    # *********************************************************************
+    # * Uncomment this section to use RUN to install other dependencies.  *
+    # * See https://aka.ms/vscode-remote/containers/dockerfile-run        *
+    # *********************************************************************
+    # && apt-get -y install --no-reccomends <your-package-list-here>
     #
     # Clean up
     && apt-get autoremove -y \

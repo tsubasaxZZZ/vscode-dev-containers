@@ -19,11 +19,12 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
         && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
-# **********************************************************
-# * Uncomment this section and to add steps for installing *
-# * any other needed dependencies.                         *
-# **********************************************************
-# RUN yum -y install <your-package-name-here> \
+# ************************************************************************
+# * Uncomment this section to use RUN to install other dependencies.     *
+# * Note that RedHat uses "yum" instead of "apt-get" like Debian/Ubuntu. *
+# * See https://aka.ms/vscode-remote/containers/dockerfile-run           *
+# ************************************************************************
+# RUN yum -y install <your-package-list-here> \
 #     # 
 #     # Clean up
 #     && yum clean all

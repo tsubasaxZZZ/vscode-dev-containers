@@ -19,10 +19,11 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
         && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
-# **********************************************************
-# * Uncomment this section and to add steps for installing *
-# * any other needed dependencies after "apt-get update".  *
-# **********************************************************
+# *************************************************************
+# * Uncomment this section to use RUN instructions to install *
+# * any needed dependencies after executing "apt-get update". *
+# * See https://docs.docker.com/engine/reference/builder/#run *
+# *************************************************************
 # ENV DEBIAN_FRONTEND=noninteractive
 # RUN apt-get update \
 #    && apt-get -y install --no-reccomends <your-package-list-here> \
