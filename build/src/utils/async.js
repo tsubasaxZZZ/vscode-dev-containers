@@ -12,6 +12,14 @@ const copyFilesCb = require('copyfiles');
 const spawnCb = require('child_process').spawn;
 
 module.exports = {
+
+    // async forEach
+    forEach: async (array, cb) => {
+        for (let i = 0; i < array.length; i++) {
+            await cb(array[i], i, array);
+        }
+    },
+
     // async spawn
     spawn: async (command, args, opts) => {
         console.log(`(*) Spawn: ${command}${args.reduce((prev, current) => `${prev} ${current}`, '')}`);
@@ -118,7 +126,7 @@ module.exports = {
     },
 
     // async gen SHA 256 hash for string
-    shaForString: (content) => {
+    shaForString: async (content) => {
         const hash = crypto.createHash('sha256');
         hash.update(content);
         return hash.digest('hex');

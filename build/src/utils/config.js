@@ -3,7 +3,13 @@
  *  Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
  *-------------------------------------------------------------------------------------------------------------*/
 
+const path = require('path');
+const asyncUtils = require('./async');
+const jsonc = require('jsonc').jsonc;
 const config = require('../../config.json');
+
+config.definitionDependencies = config.definitionDependencies || {};
+config.definitionBuildSettings = config.definitionBuildSettings || {};
 
 // Get a value from the config file or a similarly named env var
 function getConfig(property, defaultVal) {
@@ -73,6 +79,30 @@ function getTagsForVersion(definitionId, version, registry, registryPath) {
 }
 
 module.exports = {
+
+    // Must be called first
+    loadConfig: async (repoPath) => {
+        repoPath = repoPath || path.join(__dirname, '..', '..', '..');
+
+        const containersPath = path.join(repoPath, getConfig('containersPathInRepo', 'containers'));
+        const definitions = await asyncUtils.readdir(containersPath, { withFileTypes: true });
+        await asyncUtils.forEach(definitions, async (definitionFolder) => {
+            if (!definitionFolder.isDirectory()) {
+                return;
+            }
+            const definitionId = definitionFolder.name;
+            const possibleDefinitionBuildJson = path.join(containersPath, definitionId, getConfig('definitionBuildConfigFile', 'definition-build.json'));
+            if (await asyncUtils.exists(possibleDefinitionBuildJson)) {
+                const buildJson = await jsonc.read(possibleDefinitionBuildJson);
+                if (buildJson.build) {
+                    config.definitionBuildSettings[definitionId] = buildJson.build;
+                }
+                if (buildJson.dependencies) {
+                   config.definitionDependencies[definitionId] = buildJson.dependencies;
+                }
+            }
+        });
+    },
 
     // Generate complete list of tags for a given definition
     getTagList: (definitionId, release, updateLatest, registry, registryPath) => {
@@ -147,6 +177,14 @@ module.exports = {
         const distro = getLinuxDistroForDefinition(definitionId);
         const obj = objectsByDistro[distro];
         return obj;
+    },
+
+    getDefinitionDependencies: (definitionId) => {
+        return config.definitionDependencies[definitionId];
+    },
+
+    getAllDependencies: () => {
+        return config.definitionDependencies;
     },
 
     getLinuxDistroForDefinition: getLinuxDistroForDefinition,

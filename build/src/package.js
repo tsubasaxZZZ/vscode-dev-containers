@@ -13,6 +13,9 @@ async function package(repo, release, updateLatest, registry, registryPath, stub
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
+    // Load config files
+    await configUtils.loadConfig();
+
     // First, push images, update content
     const stagingFolder = await push(repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
 

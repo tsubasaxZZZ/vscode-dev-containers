@@ -2,13 +2,15 @@ const path = require('path');
 const push = require('./push').push;
 const asyncUtils = require('./utils/async');
 const configUtils = require('./utils/config');
-const definitionDependencies = require('../definition-dependencies.json');
 
 // Example manifest: https://dev.azure.com/mseng/AzureDevOps/_git/Governance.Specs?path=%2Fcgmanifest.json&version=GBusers%2Fcajone%2Fcgmanifest.json
 // Docker images and native OS libraries need to be registered as "other" while others are scenario dependant
 
 module.exports = {
     generateComponentGovernanceManifest: async (repo, release, registry, registryPath, buildFirst) => {
+
+        // Load config files
+        await configUtils.loadConfig();
 
         if(buildFirst) {
             // Simulate the build and push process, but don't actually push 
@@ -25,6 +27,7 @@ module.exports = {
         }
 
         console.log('(*) Generating manifest...');
+        const definitionDependencies = configUtils.getAllDependencies();
         for (let definitionId in definitionDependencies) {
             const dependencies = definitionDependencies[definitionId];
             if (typeof dependencies === 'object') {

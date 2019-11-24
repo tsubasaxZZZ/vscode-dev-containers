@@ -37,7 +37,7 @@ async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, re
         let sha = scriptSHA[scriptName];
         if (typeof sha === 'undefined') {
             const scriptRaw = await asyncUtils.getUrlAsString(scriptSource);
-            sha = asyncUtils.shaForString(scriptRaw);
+            sha = await asyncUtils.shaForString(scriptRaw);
             scriptSHA[scriptName] = sha;
         }
         devContainerDockerfileModified = devContainerDockerfileModified

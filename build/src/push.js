@@ -14,6 +14,9 @@ async function push(repo, release, updateLatest, registry, registryPath, stubReg
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
+    // Load config files
+    await configUtils.loadConfig();
+
     const version = configUtils.getVersionFromRelease(release);
     const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', version);
     console.log(`(*) Copying files to ${stagingFolder}\n`);
