@@ -186,7 +186,7 @@ function stubCommand(argv) {
 function cgCommand(argv) {
     generateComponentGovernanceManifest(argv.githubRepo, argv.release, argv.registry, argv.registryPath, argv.build)
         .catch((reason) => {
-            console.error(`(!) Component governence manifest generation failed - ${reason}`);
+            console.error(`(!) Component governance manifest generation failed - ${reason}`);
             process.exit(1);
         });
 }

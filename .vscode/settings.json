@@ -1,6 +1,13 @@
 {
     "extensions.ignoreRecommendations": true,
     "cSpell.words": [
-        "devcontainer"
+        "Distro",
+        "Dockerfiles",
+        "copyfiles",
+        "devcontainer",
+        "devcontainers",
+        "dpkg",
+        "npmignore",
+        "redhat"
     ]
 }
