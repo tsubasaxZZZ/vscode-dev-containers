@@ -1,7 +1,6 @@
 name: Release Containers
 
 on:
-  repository_dispatch:
   push:
     tags:
     - 'v*'
@@ -49,6 +48,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
-        asset_name: vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
+        asset_path: ./vscode-dev-containers-${{ github.ref }}.tgz
+        asset_name: vscode-dev-containers-${{ github.ref }}.tgz
         asset_content_type: application/gzip 
