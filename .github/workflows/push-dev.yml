@@ -3,6 +3,7 @@ name: CI & Push "dev"
 on: 
   push:
     branches: master
+    paths: !./cgmanifest.json
 
 jobs:
   build:
