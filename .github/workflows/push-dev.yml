@@ -35,6 +35,8 @@ jobs:
         
         # Update CG manifest
         build/vscdc cg --no-build --release master --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
+        git config --global user.email "vscr-feedback@microsoft.com"
+        git config --global user.name "CI"
         git add cgmanifest.json
         git commit -m 'Automated cgmanifest.json update'
         git push origin master
