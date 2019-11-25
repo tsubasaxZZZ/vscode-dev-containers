@@ -5,8 +5,8 @@ on:
   push:
     branches: master
     paths:
-      - containers
-      - script-library
+      - ./containers/**/*
+      - ./script-library/**/*
 
 jobs:
   build:
