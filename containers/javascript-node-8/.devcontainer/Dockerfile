@@ -12,6 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # gives sudo access. However, for Linux, this user's GID/UID must match your local
 # user UID/GID to avoid permission issues with bind mounts. Update USER_UID / USER_GID 
 # if yours is not 1000. See https://aka.ms/vscode-remote/containers/non-root-user.
+ARG USERNAME=node
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
@@ -37,7 +38,7 @@ RUN apt-get update \
     && npm install -g eslint \
     #
     # [Optional] Update a non-root user to match UID/GID - see https://aka.ms/vscode-remote/containers/non-root-user.
-    && if [ "$USER_GID" != "1000" ]; then groupmod node --gid $USER_GID; fi \
+    && if [ "$USER_GID" != "1000" ]; then groupmod --gid $USER_GID $USERNAME; fi \
     && if [ "$USER_UID" != "1000" ]; then usermod --uid $USER_UID node; fi \
     # [Optional] Add add sudo support for non-root user
     && apt-get install -y sudo \

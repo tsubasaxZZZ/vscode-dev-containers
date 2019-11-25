@@ -4,6 +4,226 @@
             "Component": {
                 "Type": "other",
                 "Other": {
+                    "Name": "Docker Image: alpine",
+                    "Version": "3.10",
+                    "DownloadUrl": "https://hub.docker.com/_/alpine"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: git",
+                    "Version": "2.22.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/git-2.22.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: bash",
+                    "Version": "5.0.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/bash-5.0.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: libgcc",
+                    "Version": "8.3.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libgcc-8.3.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: libstdc++",
+                    "Version": "8.3.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libstdc++-8.3.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: curl",
+                    "Version": "7.66.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/curl-7.66.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: wget",
+                    "Version": "1.20.3-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/wget-1.20.3-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: unzip",
+                    "Version": "6.0-r4",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/unzip-6.0-r4.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: procps",
+                    "Version": "3.3.15-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/procps-3.3.15-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: coreutils",
+                    "Version": "8.31-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/coreutils-8.31-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: ca-certificates",
+                    "Version": "20190108-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/ca-certificates-20190108-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: krb5-libs",
+                    "Version": "1.17-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/krb5-libs-1.17-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: libintl",
+                    "Version": "0.19.8.1-r4",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libintl-0.19.8.1-r4.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: libssl1.1",
+                    "Version": "1.1.1d-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libssl1.1-1.1.1d-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: lttng-ust",
+                    "Version": "2.10.3-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/lttng-ust-2.10.3-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: tzdata",
+                    "Version": "2019c-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/tzdata-2019c-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: userspace-rcu",
+                    "Version": "0.11.0-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/userspace-rcu-0.11.0-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: zlib",
+                    "Version": "1.2.11-r1",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/zlib-1.2.11-r1.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: shadow",
+                    "Version": "4.6-r2",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/shadow-4.6-r2.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: sudo",
+                    "Version": "1.8.27-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/sudo-1.8.27-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Alpine Package: zsh",
+                    "Version": "5.7.1-r0",
+                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/zsh-5.7.1-r0.apk"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": {
+                    "Name": "Oh My Zsh!",
+                    "repositoryUrl": "https://github.com/robbyrussell/oh-my-zsh",
+                    "commitHash": "c130aadb6a66aa680a322c08d87ad773316f713d"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
                     "Name": "Docker Image: debian",
                     "Version": "9",
                     "DownloadUrl": "https://hub.docker.com/_/debian"
@@ -232,236 +452,6 @@
         },
         {
             "Component": {
-                "Type": "git",
-                "git": {
-                    "Name": "Oh My Zsh!",
-                    "repositoryUrl": "https://github.com/robbyrussell/oh-my-zsh",
-                    "commitHash": "c130aadb6a66aa680a322c08d87ad773316f713d"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Docker Image: ubuntu",
-                    "Version": "18.04",
-                    "DownloadUrl": "https://hub.docker.com/_/ubuntu"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Docker Image: alpine",
-                    "Version": "3.10",
-                    "DownloadUrl": "https://hub.docker.com/_/alpine"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: git",
-                    "Version": "2.22.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/git-2.22.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: bash",
-                    "Version": "5.0.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/bash-5.0.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: libgcc",
-                    "Version": "8.3.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libgcc-8.3.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: libstdc++",
-                    "Version": "8.3.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libstdc++-8.3.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: curl",
-                    "Version": "7.66.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/curl-7.66.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: wget",
-                    "Version": "1.20.3-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/wget-1.20.3-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: unzip",
-                    "Version": "6.0-r4",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/unzip-6.0-r4.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: procps",
-                    "Version": "3.3.15-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/procps-3.3.15-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: coreutils",
-                    "Version": "8.31-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/coreutils-8.31-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: ca-certificates",
-                    "Version": "20190108-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/ca-certificates-20190108-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: krb5-libs",
-                    "Version": "1.17-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/krb5-libs-1.17-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: libintl",
-                    "Version": "0.19.8.1-r4",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libintl-0.19.8.1-r4.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: libssl1.1",
-                    "Version": "1.1.1d-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/libssl1.1-1.1.1d-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: lttng-ust",
-                    "Version": "2.10.3-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/lttng-ust-2.10.3-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: tzdata",
-                    "Version": "2019c-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/tzdata-2019c-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: userspace-rcu",
-                    "Version": "0.11.0-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/userspace-rcu-0.11.0-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: zlib",
-                    "Version": "1.2.11-r1",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/zlib-1.2.11-r1.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: shadow",
-                    "Version": "4.6-r2",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/shadow-4.6-r2.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: sudo",
-                    "Version": "1.8.27-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/sudo-1.8.27-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
-                "Type": "other",
-                "Other": {
-                    "Name": "Alpine Package: zsh",
-                    "Version": "5.7.1-r0",
-                    "DownloadUrl": "http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/zsh-5.7.1-r0.apk"
-                }
-            }
-        },
-        {
-            "Component": {
                 "Type": "other",
                 "Other": {
                     "Name": "Docker Image: node",
@@ -485,7 +475,7 @@
                 "Type": "npm",
                 "Npm": {
                     "Name": "eslint",
-                    "Version": "6.6.0"
+                    "Version": "6.7.0"
                 }
             }
         },
@@ -514,6 +504,16 @@
                 "Npm": {
                     "Name": "typescript",
                     "Version": "3.7.2"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Docker Image: ubuntu",
+                    "Version": "18.04",
+                    "DownloadUrl": "https://hub.docker.com/_/ubuntu"
                 }
             }
         }

@@ -1,17 +1,24 @@
 const path = require('path');
 const push = require('./push').push;
-const utils = require('./utils');
-const definitionDependencies = require('../definition-dependencies.json');
+const asyncUtils = require('./utils/async');
+const configUtils = require('./utils/config');
 
 // Example manifest: https://dev.azure.com/mseng/AzureDevOps/_git/Governance.Specs?path=%2Fcgmanifest.json&version=GBusers%2Fcajone%2Fcgmanifest.json
 // Docker images and native OS libraries need to be registered as "other" while others are scenario dependant
 
 module.exports = {
-    generateComponentGovernanceManifest: async (repo, release, registry, registryPath) => {
-        console.log('(*) Simulating push process to trigger image builds...');
+    generateComponentGovernanceManifest: async (repo, release, registry, registryPath, buildFirst) => {
 
-        // Simulate the build and push process, but don't actually push 
-        await push(repo, release, false, registry, registryPath, registry, registryPath, true);
+        // Load config files
+        await configUtils.loadConfig();
+
+        if(buildFirst) {
+            // Simulate the build and push process, but don't actually push 
+            console.log('(*) Simulating push process to trigger image builds...');
+            await push(repo, release, false, registry, registryPath, registry, registryPath, true);
+        } else {
+            console.log('(*) Using existing local images...');            
+        }
 
         const alreadyRegistered = {};
         const cgManifest = {
@@ -20,6 +27,7 @@ module.exports = {
         }
 
         console.log('(*) Generating manifest...');
+        const definitionDependencies = configUtils.getAllDependencies();
         for (let definitionId in definitionDependencies) {
             const dependencies = definitionDependencies[definitionId];
             if (typeof dependencies === 'object') {
@@ -41,7 +49,7 @@ module.exports = {
                 }
 
                 // Docker image to use to determine installed package versions
-                const imageTag = utils.getTagsForVersion(definitionId, 'dev', registry, registryPath)[0]
+                const imageTag = configUtils.getTagsForVersion(definitionId, 'dev', registry, registryPath)[0]
 
                 // Run commands in the package to pull out needed versions - Debian
                 if (dependencies.debian) {
@@ -111,7 +119,7 @@ module.exports = {
 
         }
         console.log('(*) Writing manifest...');
-        await utils.writeFile(
+        await asyncUtils.writeFile(
             path.join(__dirname, '..', '..', 'cgmanifest.json'),
             JSON.stringify(cgManifest, undefined, 4))
         console.log('(*) Done!');
@@ -126,7 +134,7 @@ async function generatePackageComponentList(namePrefix, packageList, imageTag, a
     const packageVersionListCommand = packageList.reduce((prev, current) => {
         return prev += ` ${current}`;
     }, listCommand);
-    const packageVersionListOutput = await utils.spawn('docker',
+    const packageVersionListOutput = await asyncUtils.spawn('docker',
         ['run', '--rm', imageTag, packageVersionListCommand],
         { shell: true, stdio: 'pipe' });
 
@@ -135,7 +143,7 @@ async function generatePackageComponentList(namePrefix, packageList, imageTag, a
     const packageUriCommand = packageList.reduce((prev, current) => {
         return prev += ` ${current}`;
     }, getUriCommand);
-    const packageUriCommandOutput = await utils.spawn('docker',
+    const packageUriCommandOutput = await asyncUtils.spawn('docker',
         ['run', '--rm', imageTag, `sh -c '${packageUriCommand}'`],
         { shell: true, stdio: 'pipe' });
 
@@ -204,7 +212,7 @@ async function generateNpmComponentList(packageList, alreadyRegistered) {
         if (package.indexOf('@') >= 0) {
             [package, version] = package.split('@');
         } else {
-            const npmInfoRaw = await utils.spawn('npm', ['info', package, '--json'], { shell: true, stdio: 'pipe' });
+            const npmInfoRaw = await asyncUtils.spawn('npm', ['info', package, '--json'], { shell: true, stdio: 'pipe' });
             const npmInfo = JSON.parse(npmInfoRaw);
             version = npmInfo['dist-tags'].latest;
         }

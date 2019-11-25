@@ -4,58 +4,6 @@
 	"stubRegistry": "mcr.microsoft.com",
 	"stubRegistryPath": "vscode/devcontainers",
 
-	"definitionBuildSettings": {
-		"debian-9-git": {
-			"latest": true,
-			"rootDistro": "debian",
-			"tags": [
-				"base:${VERSION}-debian-9",
-				"base:${VERSION}-stretch"
-			]
-		},
-		"ubuntu-18.04-git": {
-			"rootDistro": "debian",
-			"tags": [
-				"base:${VERSION}-ubuntu-18.04",
-				"base:${VERSION}-bionic"
-			]
-		},
-		"alpine-3.10-git": {
-			"rootDistro": "alpine",
-			"tags": [
-				 "base:${VERSION}-alpine-3.10"
-			]
-		},
-		"javascript-node-12": {
-			"latest": true,
-			"rootDistro": "debian",
-			"tags": [
-				"javascript-node:${VERSION}-12"
-			]
-		},
-		"javascript-node-10": {
-			"rootDistro": "debian",
-			"tags": [
-				"javascript-node:${VERSION}-10"
-			]
-		},
-		"typescript-node-12": {
-			"latest": true,
-			"rootDistro": "debian",
-			"parent": "javascript-node-12",
-			"tags": [
-				"typescript-node:${VERSION}-12"
-			]
-		},
-		"typescript-node-10": {
-			"rootDistro": "debian",
-			"parent": "javascript-node-10",
-			"tags": [
-				"typescript-node:${VERSION}-10"
-			]
-		}
-	},
-
 	"filesToStage": [
 		"+(containers|repository-containers)/**/!(test-project)/*",
 		"LICENSE",
@@ -67,6 +15,7 @@
 	"githubRepoName": "microsoft/vscode-dev-containers",
 	"containersPathInRepo": "containers",
 	"scriptLibraryPathInRepo": "script-library",
+	"definitionBuildConfigFile": "definition-build.json",
 
 	"devContainerJsonPreamble": "For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:",
 	"dockerFilePreamble": "For information on the contents of the container image below, see following Dockerfile:"

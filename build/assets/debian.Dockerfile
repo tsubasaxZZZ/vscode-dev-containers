@@ -12,25 +12,26 @@ FROM REPLACE-ME
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# [Optional] Update UID/GID if needed and install additional software
+# [Optional] Update UID/GID if needed
 RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
-        sudo groupmod 1000 --gid $USER_GID \
-        && sudo usermod --uid $USER_UID --gid $USER_GID 1000; \
+        USERNAME=$(awk -v val=1000 -F ":" '$3==val{print $1}' /etc/passwd) \
+        && groupmod --gid $USER_GID $USERNAME \
+        && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
     fi
 
+# *************************************************************
+# * Uncomment this section to use RUN instructions to install *
+# * any needed dependencies after executing "apt-get update". *
+# * See https://docs.docker.com/engine/reference/builder/#run *
+# *************************************************************
 # ENV DEBIAN_FRONTEND=noninteractive
 # RUN apt-get update \
-#    #
-#    # ****************************************************************
-#    # * Add steps for installing any other needed dependencies here. *
-#    # * Omit sudo if it isn't installed and you are running as root. *
-#    # ****************************************************************
-#    && sudo apt-get -y install --no-reccomends <your-package-name-here>
+#    && apt-get -y install --no-reccomends <your-package-list-here> \
 #    #
 #    # Clean up
-#    && sudo apt-get autoremove -y \
-#    && sudo apt-get clean -y \
-#    && sudo rm -rf /var/lib/apt/lists/*
+#    && apt-get autoremove -y \
+#    && apt-get clean -y \
+#    && rm -rf /var/lib/apt/lists/*
 # ENV DEBIAN_FRONTEND=dialog
 
 # Uncomment to default to non-root user
