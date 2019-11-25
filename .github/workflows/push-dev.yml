@@ -37,10 +37,9 @@ jobs:
         build/vscdc cg --no-build --release ${{ github.ref }} --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
         git config --global user.email "vscr-feedback@microsoft.com"
         git config --global user.name "CI"
-        git remote add ci https://ci:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add cgmanifest.json
         git commit -m 'Automated cgmanifest.json update'
-        git push ci ${{ github.ref }}
+        git push "https://ci:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:${{ github.ref }}
 
     - name: Upload Package
       uses: actions/upload-artifact@v1.0.0
