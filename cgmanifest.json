@@ -475,7 +475,7 @@
                 "Type": "npm",
                 "Npm": {
                     "Name": "eslint",
-                    "Version": "6.7.0"
+                    "Version": "6.7.1"
                 }
             }
         },
