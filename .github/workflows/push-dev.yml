@@ -3,12 +3,13 @@ name: CI & Push "dev"
 on: 
   push:
     branches: master
-    paths: !./cgmanifest.json
 
 jobs:
   build:
     
     runs-on: ubuntu-latest
+
+    if: "!contains(github.event.head_commit.message, 'Automated cgmanifest.json update')"
     
     steps:
 
@@ -31,6 +32,11 @@ jobs:
         yarn install
         build/vscdc pack --release master --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }} --stub-registry ${{ secrets.STUB_REGISTRY }} --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
         mv ./vscode-dev-containers-*.tgz ./vscode-dev-containers-${{ github.sha }}.tgz
+        
+        build/vscdc cg --no-build --release master --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
+        git add cgmanifest.json
+        git commit -m 'Automated cgmanifest.json update'
+        git push origin master
 
     - name: Upload Package
       uses: actions/upload-artifact@v1.0.0
