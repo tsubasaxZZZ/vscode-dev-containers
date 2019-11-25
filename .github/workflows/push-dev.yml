@@ -25,7 +25,7 @@ jobs:
       id: checkout
       uses: actions/checkout@v1
       
-    - name: Push "dev" and Test Packaging
+    - name: Push "dev", Package, update CG manifest
       run: |
         # Push dev images and package
         set -e
@@ -33,6 +33,7 @@ jobs:
         build/vscdc pack --release master --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }} --stub-registry ${{ secrets.STUB_REGISTRY }} --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
         mv ./vscode-dev-containers-*.tgz ./vscode-dev-containers-${{ github.sha }}.tgz
         
+        # Update CG manifest
         build/vscdc cg --no-build --release master --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
         git add cgmanifest.json
         git commit -m 'Automated cgmanifest.json update'
