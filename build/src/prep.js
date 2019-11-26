@@ -19,8 +19,6 @@ const stubPromises = {
 const containersPathInRepo = configUtils.getConfig('containersPathInRepo');
 const scriptLibraryPathInRepo = configUtils.getConfig('scriptLibraryPathInRepo');
 
-const expectedRegistryPath = `${configUtils.getConfig('stubRegistry', 'mcr.microsoft.com')}/${configUtils.getConfig('stubRegistryPath', 'vscode/devcontainers')}`;
-
 async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath, isForBuild) {
     // Use exact version of building, MAJOR.MINOR if not
     const version = isForBuild ? configUtils.getVersionFromRelease(release) : configUtils.majorMinorFromRelease(release);
@@ -46,20 +44,26 @@ async function prepDockerFile(devContainerDockerfilePath, definitionId, repo, re
     }
 
     if (isForBuild) {
-        // Update FROM to target registry and version if vscode-dev-containers MCR path is detected
+        // If building, update FROM to target registry and version if definition has a parent
         const parentTag = configUtils.getParentTagForVersion(definitionId, version, registry, registryPath);
         if (parentTag) {
             devContainerDockerfileModified = devContainerDockerfileModified.replace(/FROM .+:.+/, `FROM ${parentTag}`)
         }
     } else {
-        // Otherwise update any Dockerfiles that refer to mcr tags with the correct version 
-        const fromCaptureGroups = new RegExp(
-            `(FROM ${expectedRegistryPath}/${scriptLibraryPathInRepo.replace('.', '\\.')}/.+)(:.+)"`)
-            .exec(devContainerDockerfileRaw);
-
+        const expectedRegistry = 'mcr.microsoft.com';
+        const expectedRegistryPath = configUtils.getConfig('stubRegistryPath', 'vscode/devcontainers');
+        // Otherwise update any Dockerfiles that refer to the expected MCR path with the correct registry and version 
+        const fromCaptureGroups = new RegExp(`FROM (${expectedRegistry}/${expectedRegistryPath}/.+:.+)`).exec(devContainerDockerfileRaw);
         if (fromCaptureGroups) {
+            const fromDefinitionTag = configUtils.getUpdatedTag(
+                fromCaptureGroups[1], 
+                expectedRegistry,
+                expectedRegistryPath,
+                version, 
+                stubRegistry,
+                stubRegistryPath);
             devContainerDockerfileModified = devContainerDockerfileModified
-                .replace(fromCaptureGroups[0], `${fromCaptureGroups[1]}${fromCaptureGroups[2].replace(':dev', `:${version}`)}`)
+                .replace(fromCaptureGroups[0], `FROM ${fromDefinitionTag}`);
         }
     }
 

@@ -5,19 +5,26 @@
 
 const path = require('path');
 const push = require('./push').push;
+const prep = require('./prep');
 const asyncUtils = require('./utils/async');
 const configUtils = require('./utils/config');
 const packageJson = require('../../package.json');
 
-async function package(repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate) {
+async function package(repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, pushImages, cleanWhenDone, simulate) {
     stubRegistry = stubRegistry || registry;
     stubRegistryPath = stubRegistryPath || registryPath;
 
     // Load config files
     await configUtils.loadConfig();
 
-    // First, push images, update content
-    const stagingFolder = await push(repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
+    // Stage content
+    const stagingFolder = await configUtils.getStagingFolder(release);
+    const definitionStagingFolder = path.join(stagingFolder, 'containers');
+
+    if (pushImages) {
+        // First, push images, update content
+        await push(repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
+    }
 
     // Then package
     console.log(`\n(*) **** Package ${release} ****`);
@@ -30,6 +37,14 @@ async function package(repo, release, updateLatest, registry, registryPath, stub
     const packageJsonModified = packageJsonRaw.replace(/"version".?:.?".+"/, `"version": "${packageJsonVersion}"`);
     await asyncUtils.writeFile(packageJsonPath, packageJsonModified);
 
+    // Update all definition config files for release (devcontainer.json, Dockerfile)
+    const allDefinitions = await asyncUtils.readdir(definitionStagingFolder);
+    await asyncUtils.forEach(allDefinitions, async (currentDefinitionId) => {
+        await prep.updateConfigForRelease(
+            path.join(definitionStagingFolder, currentDefinitionId),
+            currentDefinitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath);
+    });
+    
     console.log('(*) Packaging...');
     const opts = { stdio: 'inherit', cwd: stagingFolder, shell: true };
     await asyncUtils.spawn('yarn', ['install'], opts);
@@ -46,9 +61,11 @@ async function package(repo, release, updateLatest, registry, registryPath, stub
         await asyncUtils.rename(path.join(stagingFolder, `${packageJson.name}-${packageJsonVersion}.tgz`), outputPath);
     }
 
-    // And finally clean up
-    console.log('(*) Cleaning up...');
-    await asyncUtils.rimraf(stagingFolder);
+    if (cleanWhenDone) {
+        // And finally clean up
+        console.log('(*) Cleaning up...');
+        await asyncUtils.rimraf(stagingFolder);
+    }
 
     console.log('(*) Done!!');
 

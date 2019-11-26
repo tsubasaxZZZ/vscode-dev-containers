@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
  *-------------------------------------------------------------------------------------------------------------*/
 
-const os = require('os');
 const path = require('path');
 const jsonc = require('jsonc').jsonc;
 const asyncUtils = require('./utils/async');
@@ -17,37 +16,18 @@ async function push(repo, release, updateLatest, registry, registryPath, stubReg
     // Load config files
     await configUtils.loadConfig();
 
-    const version = configUtils.getVersionFromRelease(release);
-    const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', version);
-    console.log(`(*) Copying files to ${stagingFolder}\n`);
-    await asyncUtils.rimraf(stagingFolder); // Clean out folder if it exists
-    await asyncUtils.mkdirp(stagingFolder); // Create the folder
-    await asyncUtils.copyFiles(
-        path.resolve(__dirname, '..', '..'),
-        configUtils.getConfig('filesToStage'),
-        stagingFolder);
-
+    // Stage content
+    const stagingFolder = await configUtils.getStagingFolder(release);
     const definitionStagingFolder = path.join(stagingFolder, 'containers');
 
     // Build and push subset of images
     const definitionsToPush = definitionId ? [definitionId] : configUtils.getSortedDefinitionBuildList();
-    for (let i = 0; i < definitionsToPush.length; i++) {
-        const currentDefinitionId = definitionsToPush[i];
+    await asyncUtils.forEach(definitionsToPush, async (currentDefinitionId) => {
         console.log(`**** Pushing ${currentDefinitionId} ${release} ****`);
-        await pushImage(path.join(definitionStagingFolder, currentDefinitionId),
-            currentDefinitionId, repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
-    }
-
-    // Update all definition config files for release (devcontainer.json, Dockerfile)
-    const allDefinitions = definitionId ? [definitionId] : await asyncUtils.readdir(definitionStagingFolder);
-    for (let i = 0; i < allDefinitions.length; i++) {
-        const currentDefinitionId = allDefinitions[i];
-        await prep.updateConfigForRelease(
+        await pushImage(
             path.join(definitionStagingFolder, currentDefinitionId),
-            currentDefinitionId, repo, release, registry, registryPath, stubRegistry, stubRegistryPath);
-    }
-
-    console.log('(*) Done!\n');
+            currentDefinitionId, repo, release, updateLatest, registry, registryPath, stubRegistry, stubRegistryPath, simulate);
+    });
 
     return stagingFolder;
 }
@@ -90,9 +70,9 @@ async function pushImage(definitionPath, definitionId, repo, release, updateLate
         console.log(`(*) Simulating: Skipping push to registry.`);
     } else {
         console.log(`(*) Pushing ${definitionId}...`);
-        for (let i = 0; i < versionTags.length; i++) {
-            await asyncUtils.spawn('docker', ['push', versionTags[i]], spawnOpts);
-        }
+        await asyncUtils.forEach(versionTags, async (versionTag) => {
+            await asyncUtils.spawn('docker', ['push', versionTag], spawnOpts);
+        });
     }
 
     // If base.Dockerfile found, update stub/devcontainer.json, otherwise create

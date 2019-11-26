@@ -37,19 +37,29 @@ require('yargs')
                     describe: 'stub registry path',
                     default: configUtils.getConfig('stubRegistryPath', configUtils.getConfig('containerRegistryPath', ''))
                 },
-                'simulate': {
-                    describe: 'whether to simulate a push instead of doing it',
-                    type: 'boolean',
-                    default: false
-                },
                 'github-repo': {
                     describe: 'vscode-dev-containers repo name',
                     default: configUtils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
+                },
+                'push-images': {
+                    describe: 'whether to push before packaging',
+                    type: 'boolean',
+                    default: true
                 },
                 'update-latest': {
                     describe: 'whether to tag latest and {MAJOR}',
                     type: 'boolean',
                     default: true
+                },
+                'clean': {
+                    describe: 'whether to clean up staging folder when done',
+                    type: 'boolean',
+                    default: true
+                },
+                'simulate': {
+                    describe: 'whether to simulate a push instead of doing it',
+                    type: 'boolean',
+                    default: false
                 }
             })
     }, packCommand)
@@ -85,7 +95,7 @@ require('yargs')
                     default: configUtils.getConfig('githubRepoName', 'microsoft/vscode-dev-containers')
                 },
                 'update-latest': {
-                    describe: 'whether to tag latest and {MAJOR}',
+                    describe: 'whether to tag latest and {MAJOR} if pushing',
                     type: 'boolean',
                     default: true
                 },
@@ -149,7 +159,7 @@ require('yargs')
                     default: configUtils.getConfig('vscodeDevContainersRepo', 'https://github.com/microsoft/vscode-dev-containers')
                 },
                 'build': {
-                    describe: 'skip the image build step',
+                    describe: 'whether to skip the image build step',
                     default: true
                 }
             })
@@ -167,7 +177,7 @@ function pushCommand(argv) {
 }
 
 function packCommand(argv) {
-    package(argv.githubRepo, argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.simulate)
+    package(argv.githubRepo, argv.release, argv.updateLatest, argv.registry, argv.registryPath, argv.stubRegistry, argv.stubRegistryPath, argv.pushImages, argv.clean, argv.simulate)
         .catch((reason) => {
             console.error(`(!) Packaging failed - ${reason}`);
             process.exit(1);

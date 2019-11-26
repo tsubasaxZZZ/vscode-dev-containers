@@ -206,8 +206,7 @@ function filteredManualComponentRegistrations(manualRegistrations, alreadyRegist
 
 async function generateNpmComponentList(packageList, alreadyRegistered) {
     const componentList = [];
-    for (let i = 0; i < packageList.length; i++) {
-        let package = packageList[i];
+    await asyncUtils.forEach(packageList, async (package) => {
         let version = '';
         if (package.indexOf('@') >= 0) {
             [package, version] = package.split('@');
@@ -231,6 +230,6 @@ async function generateNpmComponentList(packageList, alreadyRegistered) {
             alreadyRegistered[uniquePackageName] = alreadyRegistered[uniquePackageName] || [];
             alreadyRegistered[uniquePackageName].push(version);
         }
-    }
+    });
     return componentList;
 }

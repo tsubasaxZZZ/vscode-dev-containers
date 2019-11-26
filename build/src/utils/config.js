@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
  *-------------------------------------------------------------------------------------------------------------*/
 
+const os = require('os');
 const path = require('path');
 const asyncUtils = require('./async');
 const jsonc = require('jsonc').jsonc;
@@ -10,6 +11,9 @@ const config = require('../../config.json');
 
 config.definitionDependencies = config.definitionDependencies || {};
 config.definitionBuildSettings = config.definitionBuildSettings || {};
+
+const stagingFolders = {};
+const definitionTagLookup = {};
 
 // Get a value from the config file or a similarly named env var
 function getConfig(property, defaultVal) {
@@ -102,6 +106,20 @@ module.exports = {
                 }
             }
         });
+
+        // Populate tag lookup
+        for(let definitionId in config.definitionBuildSettings) {
+            if (config.definitionBuildSettings[definitionId].tags) {
+                const blankTagList = getTagsForVersion(definitionId, '', 'ANY', 'ANY');
+                blankTagList.forEach((blankTag) => {
+                    definitionTagLookup[blankTag] = definitionId;
+                });
+                const devTagList = getTagsForVersion(definitionId, 'dev', 'ANY', 'ANY');
+                devTagList.forEach((devTag) => {
+                    definitionTagLookup[devTag] = definitionId;
+                });
+            }
+        }
     },
 
     // Generate complete list of tags for a given definition
@@ -160,6 +178,13 @@ module.exports = {
         return parentId ? getTagsForVersion(parentId, version, registry, registryPath)[0] : null;
     },
 
+    getUpdatedTag: (tag, expectedRegistry, expectedRegistryPath, version, registry, registryPath) => {
+        registry = registry || expectedRegistry;
+        registryPath = registryPath || expectedRegistryPath;
+        const captureGroups = new RegExp(`${expectedRegistry}/${expectedRegistryPath}/(.+:.+)`).exec(tag);
+        return getTagsForVersion(definitionTagLookup[`ANY/ANY/${captureGroups[1]}`], version, registry, registryPath)[0];
+    },
+
     // Return just the manor and minor version of a release number
     majorMinorFromRelease: (release) => {
         const version = getVersionFromRelease(release);
@@ -185,6 +210,22 @@ module.exports = {
 
     getAllDependencies: () => {
         return config.definitionDependencies;
+    },
+
+    getStagingFolder: async (release) => {
+        if (!stagingFolders[release]) {
+            const stagingFolder = path.join(os.tmpdir(), 'vscode-dev-containers', release);
+            console.log(`(*) Copying files to ${stagingFolder}\n`);
+            await asyncUtils.rimraf(stagingFolder); // Clean out folder if it exists
+            await asyncUtils.mkdirp(stagingFolder); // Create the folder
+            await asyncUtils.copyFiles(
+                path.resolve(__dirname, '..', '..', '..'),
+                getConfig('filesToStage'),
+                stagingFolder);
+        
+            stagingFolders[release] = stagingFolder;
+        }
+        return stagingFolders[release];
     },
 
     getLinuxDistroForDefinition: getLinuxDistroForDefinition,
