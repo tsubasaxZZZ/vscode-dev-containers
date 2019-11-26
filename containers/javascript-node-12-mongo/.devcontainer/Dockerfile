@@ -16,14 +16,15 @@ ARG USER_GID=$USER_UID
 # [Optional] Update UID/GID if needed
 RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
         groupmod --gid $USER_GID $USERNAME \
-        && usermod --uid $USER_UID --gid $USER_GID $USERNAME; \
+        && usermod --uid $USER_UID --gid $USER_GID $USERNAME \
+        && chmod -R $USER_UID:$USER_GID /home/$USERNAME; \
     fi
 
-
-# *********************************************************************
-# * Uncomment this section to use RUN to install other dependencies.  *
-# * See https://aka.ms/vscode-remote/containers/dockerfile-run        *
-# *********************************************************************
+# *************************************************************
+# * Uncomment this section to use RUN instructions to install *
+# * any needed dependencies after executing "apt-get update". *
+# * See https://docs.docker.com/engine/reference/builder/#run *
+# *************************************************************
 # ENV DEBIAN_FRONTEND=noninteractive
 # RUN apt-get update \
 #    && apt-get -y install --no-reccomends <your-package-list-here> \
