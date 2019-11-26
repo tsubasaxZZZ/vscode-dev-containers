@@ -1,9 +1,10 @@
 name: Release Containers
 
 on:
-  push:
-    tags:
-    - 'v*'
+  repository_dispatch:
+  #push:
+  #  tags:
+  #  - 'v*'
 
 jobs:
   build:
@@ -11,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+
+    - name: Get Tag Name
+      id: get_tag_name  
+      uses: olegtarasov/get-tag@v1
 
     - name: Container Registry Login
       id: docker_login
@@ -28,7 +33,12 @@ jobs:
       run: |
         # Push images and package
         yarn install
-        build/vscdc pack --release ${{ github.ref }} --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }} --stub-registry ${{ secrets.STUB_REGISTRY }} --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
+        build/vscdc pack  --release ${{ steps.get_tag_name.outputs.tag }} \
+                          --github-repo ${{ github.repository }} \
+                          --registry ${{ secrets.REGISTRY }} \
+                          --registry-path ${{ secrets.REGISTRY_BASE_PATH }} \
+                          --stub-registry ${{ secrets.STUB_REGISTRY }} \
+                          --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
         
     - name: Create Release
       id: create_release
@@ -48,6 +58,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./vscode-dev-containers-${{ github.ref }}.tgz
-        asset_name: vscode-dev-containers-${{ github.ref }}.tgz
+        asset_path: ./vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
+        asset_name: vscode-dev-containers-${{ steps.get_tag_name.outputs.tag }}.tgz
         asset_content_type: application/gzip 

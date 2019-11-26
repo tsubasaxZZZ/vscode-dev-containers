@@ -78,7 +78,7 @@ module.exports = {
         console.log('(*) Generating user Dockerfile...');
         const templateDockerfile = await configUtils.objectByDefinitionLinuxDistro(definitionId, stubPromises);
         const majorMinor = configUtils.majorMinorFromRelease(release);
-        const imageTag = configUtils.getTagsForVersion(definitionId, majorMinor, stubRegistry, stubRegistryPath);
+        const imageTag = configUtils.getTagsForVersion(definitionId, majorMinor, stubRegistry, stubRegistryPath)[0];
         const userDockerFile = templateDockerfile.replace(
             'FROM REPLACE-ME', getFromSnippet(definitionId, imageTag, repo, release, baseDockerFileExists));
         await asyncUtils.writeFile(userDockerFilePath, userDockerFile);
@@ -90,7 +90,7 @@ module.exports = {
         const userDockerFile = await asyncUtils.readFile(userDockerFilePath);
 
         const majorMinor = configUtils.majorMinorFromRelease(release);
-        const imageTag = configUtils.getTagsForVersion(definitionId, majorMinor, registry, registryPath);
+        const imageTag = configUtils.getTagsForVersion(definitionId, majorMinor, registry, registryPath)[0];
         const userDockerFileModified = userDockerFile.replace(/FROM .+:.+/,
             getFromSnippet(definitionId, imageTag, repo, release, baseDockerFileExists));
         await asyncUtils.writeFile(userDockerFilePath, userDockerFileModified);

@@ -2,18 +2,18 @@ name: CI & Push "dev"
 
 on: 
   repository_dispatch:
-  push:
-    branches: master
-    paths:
-      - ./containers/**/*
-      - ./script-library/**/*
+  #push:
+  #  branches: master
+  #  paths:
+  #    - 'containers/**'
+  #    - 'script-library/**'
 
 jobs:
   build:
     
     runs-on: ubuntu-latest
 
-    if: "!contains(github.event.head_commit.message, 'Automated cgmanifest.json update')"
+    if: "!contains(github.event.head_commit.message, 'Automated update') && !contains(github.event.head_commit.message, 'CI ignore')"
     
     steps:
 
@@ -33,17 +33,24 @@ jobs:
       run: |
         # Push dev images and package
         set -e
+        GIT_BRANCH=$(echo "${{ github.ref }}" | grep -oP 'refs/(heads|tags)/\K(.+)')
         yarn install
-        build/vscdc pack --release ${{ github.ref }} --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }} --stub-registry ${{ secrets.STUB_REGISTRY }} --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
+        build/vscdc pack  --release $GIT_BRANCH \
+                          --github-repo ${{ github.repository }} \
+                          --registry ${{ secrets.REGISTRY }} \
+                          --registry-path ${{ secrets.REGISTRY_BASE_PATH }} \
+                          --stub-registry ${{ secrets.STUB_REGISTRY }} \
+                          --stub-registry-path ${{ secrets.STUB_REGISTRY_BASE_PATH }}
         mv ./vscode-dev-containers-*.tgz ./vscode-dev-containers-${{ github.sha }}.tgz
         
         # Update CG manifest
-        build/vscdc cg --no-build --release ${{ github.ref }} --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
+        build/vscdc cg --no-build --release $BRANCH --github-repo ${{ github.repository }} --registry ${{ secrets.REGISTRY }} --registry-path ${{ secrets.REGISTRY_BASE_PATH }}
         git config --global user.email "vscr-feedback@microsoft.com"
         git config --global user.name "CI"
         git add cgmanifest.json
-        git commit -m 'Automated cgmanifest.json update'
-        git push "https://ci:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:${{ github.ref }}
+        git commit -m 'Automated update' \
+          && git push "https://ci:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "HEAD:${{ github.ref }}" \
+          || echo 'No updates to cgmanifest.json'
 
     - name: Upload Package
       uses: actions/upload-artifact@v1.0.0
